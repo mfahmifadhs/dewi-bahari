@@ -1,16 +1,13 @@
 import express from "express";
-import { getUsers, Register, Login, Logout, deleteUsers } from "../controllers/Users.js";
+import { deleteUsers, updateUser, getAllUser, getUserById } from "../controllers/Users.js";
 import { verifyToken } from "../middleware/VerifyToken.js";
-import { refreshToken } from "../controllers/RefreshToken.js";
-import { adminOnly } from "../middleware/VerifyUser.js";
+import { superAdminOnly } from "../middleware/VerifyUser.js";
 
 const routeUser = express.Router();
 
-routeUser.get('/', verifyToken, getUsers);
-routeUser.post('/', Register);
-routeUser.post('/login', Login);
-routeUser.get('/token', refreshToken);
-routeUser.delete('/logout', Logout);
+routeUser.get('/us', getAllUser);
+routeUser.get('/us/:id', getUserById);
+routeUser.patch('/us/:id', updateUser);
 routeUser.delete('/us/:id', verifyToken, deleteUsers);
 
 export default routeUser;

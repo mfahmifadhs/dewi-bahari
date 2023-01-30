@@ -3,15 +3,17 @@ import Menu from "../models/menuModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+// Get all menu
 export const getAllMenu = async(req, res) => {
     try {
-        const users = await Menu.findAll();
-        res.json(users);
+        const menus = await Menu.findAll();
+        res.json(menus);
     } catch (error) {
         console.log(error);
     }
 }
 
+// Get menu by id
 export const getMenuById = async (req, res) => {
    try {
        const menus = await Menu.findAll({
@@ -25,6 +27,7 @@ export const getMenuById = async (req, res) => {
    }
 }
 
+// Create menu
 export const createMenu = async (req, res) => {
     console.log(req.body)
     try {
@@ -42,7 +45,7 @@ export const createMenu = async (req, res) => {
     }
 }
 
-// Update product
+// Update menu
 export const updateMenu = async (req, res) => {
     try {
         const { menu, description, isDelete } = req.body;
@@ -63,7 +66,7 @@ export const updateMenu = async (req, res) => {
     }
 }
 
-// Delete product
+// Delete menu
 export const deleteMenu = async (req, res) => {
     try {
         await Menu.destroy({

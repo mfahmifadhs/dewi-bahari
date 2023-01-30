@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import db from "../config/database.js";
+import Roles from "../models/roleModel.js";
 
 const { DataTypes } = Sequelize;
  
@@ -13,7 +14,13 @@ const Users = db.define('t_users',{
         }
     },
     roleId:{
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER(11),
+        allowNull: false,
+        references: {
+            model: 'roleModel',
+            key: 'ID'
+        },
+        field: 'roleId'
     },
     email:{
         type: DataTypes.STRING
@@ -30,6 +37,9 @@ const Users = db.define('t_users',{
     password:{
         type: DataTypes.TEXT
     },
+    passwordText:{
+        type: DataTypes.TEXT
+    },
     refreshToken:{
         type: DataTypes.TEXT
     },
@@ -39,5 +49,7 @@ const Users = db.define('t_users',{
 },{
     freezeTableName: true
 });
+
+Users.belongsTo(Roles, {foreignKey: 'roleId', targetKey: 'id'})
  
 export default Users;
