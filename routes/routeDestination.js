@@ -1,5 +1,5 @@
 import express from "express";
-import { createDestination, deleteDestination, getAllDestination, getDestinationById, updateDestination } from "../controllers/Destinations.js";
+import { createDestination, deleteDestination, getAllArticleByDestination, getAllCity, getAllDestination, getAllProvince, getDestinationById, updateDestination } from "../controllers/Destinations.js";
 import { superAdminOnly } from "../middleware/VerifyUser.js";
 
 const routeDestination = express.Router();
@@ -9,5 +9,11 @@ routeDestination.get('/dt/:id', getDestinationById);
 routeDestination.post('/dt', createDestination);
 routeDestination.patch('/dt/:id', updateDestination);
 routeDestination.delete('/dt/:id', deleteDestination);
+
+routeDestination.get('/pv', getAllProvince);
+// Get cities by prov id
+routeDestination.get('/ct/pv/:id', getAllCity);
+// Get article by dest
+routeDestination.get('/ar/dt/:id', getAllArticleByDestination);
 
 export default routeDestination;
