@@ -1,7 +1,7 @@
-import moment from "moment";
-import Partner from "../models/partnerModel.js";
-import path from "path";
-import fs from "fs";
+import moment from 'moment';
+import Partner from '../models/partnerModel.js';
+import path from 'path';
+import fs from 'fs';
 
 // Get all partner
 export const getAllPartner = async (req, res) => {

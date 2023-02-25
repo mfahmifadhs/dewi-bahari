@@ -1,7 +1,7 @@
-import Users from "../models/userModel.js";
-import Menu from "../models/menuModel.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import Users from '../models/userModel.js';
+import Menu from '../models/menuModel.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 // Get all menu
 export const getAllMenu = async(req, res) => {

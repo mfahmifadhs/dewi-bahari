@@ -1,11 +1,11 @@
-import Users from "../models/userModel.js";
-import Destination from "../models/destinationModel.js";
-import Provinces from "../models/provinceModel.js";
-import Cities from "../models/cityModel.js";
-import Province from "../models/provinceModel.js";
-import Article from "../models/articleModel.js";
-import path from "path";
-import fs from "fs";
+import Users from '../models/userModel.js';
+import Destination from '../models/destinationModel.js';
+import Provinces from '../models/provinceModel.js';
+import Cities from '../models/cityModel.js';
+import Province from '../models/provinceModel.js';
+import Article from '../models/articleModel.js';
+import path from 'path';
+import fs from 'fs';
 
 // Get all destination
 export const getAllDestination = async (req, res) => {

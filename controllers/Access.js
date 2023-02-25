@@ -1,6 +1,6 @@
-import Access from "../models/accessModel.js";
-import Menus from "../models/menuModel.js";
-import Users from "../models/userModel.js";
+import Access from '../models/accessModel.js';
+import Menus from '../models/menuModel.js';
+import Users from '../models/userModel.js';
 
 // Get all access
 export const getAllAccess = async (req, res) => {

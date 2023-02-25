@@ -1,6 +1,6 @@
-import Users from "../models/userModel.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import Users from '../models/userModel.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export const Me = async (req, res) => {
    if (!req.session.userId) {

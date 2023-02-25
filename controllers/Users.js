@@ -1,5 +1,5 @@
-import Users from "../models/userModel.js";
-import Roles from "../models/roleModel.js";
+import Users from '../models/userModel.js';
+import Roles from '../models/roleModel.js';
 
 // Get all user
 export const getAllUser = async (req, res) => {

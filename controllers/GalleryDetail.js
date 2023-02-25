@@ -1,11 +1,11 @@
-import Gallery from "../models/galleryModel.js";
-import GalleryDetail from "../models/galleryDetailModel.js";
-import Destinations from "../models/destinationModel.js";
-import Users from "../models/userModel.js";
-import moment from "moment";
-import path from "path";
-import fs from "fs";
-import multer from "multer";
+import Gallery from '../models/galleryModel.js';
+import GalleryDetail from '../models/galleryDetailModel.js';
+import Destinations from '../models/destinationModel.js';
+import Users from '../models/userModel.js';
+import moment from 'moment';
+import path from 'path';
+import fs from 'fs';
+import multer from 'multer';
 
 // Get data article by gallery id
 export const getDetailGallery = async (req, res) => {

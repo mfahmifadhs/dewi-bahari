@@ -1,9 +1,9 @@
-import Articles from "../models/articleModel.js";
-import Destinations from "../models/destinationModel.js";
-import Users from "../models/userModel.js";
-import moment from "moment";
-import path from "path";
-import fs from "fs";
+import Articles from '../models/articleModel.js';
+import Destinations from '../models/destinationModel.js';
+import Users from '../models/userModel.js';
+import moment from 'moment';
+import path from 'path';
+import fs from 'fs';
 
 // Get all article
 export const getAllArticle = async (req, res) => {

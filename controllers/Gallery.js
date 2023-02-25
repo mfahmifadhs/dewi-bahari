@@ -1,8 +1,8 @@
-import Galleries from "../models/galleryModel.js";
-import GalleriesDetail from "../models/galleryDetailModel.js";
-import Destinations from "../models/destinationModel.js";
-import Users from "../models/userModel.js";
-import path from "path";
+import Galleries from '../models/galleryModel.js';
+import GalleriesDetail from '../models/galleryDetailModel.js';
+import Destinations from '../models/destinationModel.js';
+import Users from '../models/userModel.js';
+import path from 'path';
 
 // Get all gallery
 export const getAllGallery = async (req, res) => {
