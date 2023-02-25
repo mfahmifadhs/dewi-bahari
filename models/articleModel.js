@@ -27,14 +27,28 @@ const Article = db.define('t_articles', {
    isApprove: {
       type: DataTypes.STRING
    },
-   isDelete: {
-      type: 'TIMESTAMP',
-      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-      allowNull: true
+   note: {
+      type: DataTypes.TEXT
+   },
+   deletedAt: {
+      type: DataTypes.DATE,
+      defaultValue: null
    }
 }, {
-   freezeTableName: true
+   freezeTableName: true,
+   defaultScope: {
+      where: { deletedAt: null }
+   }
 });
+
+Article.prototype.softDelete = function () {
+   this.setDataValue('deletedAt', new Date());
+   return this.save();
+};
+
+Article.findAllDeleted = function () {
+   return this.unscoped().findAll({ where: { deletedAt: { [Sequelize.Op.ne]: null } } });
+};
 
 
 Article.belongsTo(Users, { foreignKey: 'userId', targetKey: 'id' })

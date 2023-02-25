@@ -22,7 +22,10 @@ export const getUserById = async (req, res) => {
         const users = await Users.findAll({
             where: {
                 id: req.params.id
-            }
+            },
+            include: [{
+                model: Roles
+            }]
         });
         res.json(users[0]);
     } catch (error) {
@@ -54,17 +57,18 @@ export const updateUser = async (req, res) => {
 }
 
 // Delete user
-export const deleteUsers = async (req, res) => {
+export const deleteUser = async (req, res) => {
     try {
-        await Users.destroy({
-            where: {
-                id: req.params.id
-            }
-        });
-        res.json({
-            "message": "Users Deleted"
-        });
+       const data = await Users.findOne({
+          where: {
+             id: req.params.id
+          }
+       });
+       await data.softDelete();
+       res.json({
+          "message": "Data User Berhasil Dihapus"
+       });
     } catch (error) {
-        res.json({ message: error.message });
+       res.json({ message: error.message });
     }
-}
+ }

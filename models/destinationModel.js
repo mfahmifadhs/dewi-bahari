@@ -37,12 +37,31 @@ const Destination = db.define('t_destinations', {
    url: {
       type: DataTypes.TEXT
    },
-   isDelete: {
+   isApprove: {
       type: DataTypes.STRING
+   },
+   note: {
+      type: DataTypes.TEXT
+   },
+   deletedAt: {
+      type: DataTypes.DATE,
+      defaultValue: null
    }
 }, {
-   freezeTableName: true
+   freezeTableName: true,
+   defaultScope: {
+      where: { deletedAt: null }
+   }
 });
+
+Destination.prototype.softDelete = function () {
+   this.setDataValue('deletedAt', new Date());
+   return this.save();
+};
+
+Destination.findAllDeleted = function () {
+   return this.unscoped().findAll({ where: { deletedAt: { [Sequelize.Op.ne]: null } } });
+};
 
 Destination.belongsTo(Users, {foreignKey: 'userId', targetKey: 'id'})
 Destination.belongsTo(Province, {foreignKey: 'kdProv', targetKey: 'id'})

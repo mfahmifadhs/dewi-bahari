@@ -9,9 +9,6 @@ import fs from "fs";
 export const getAllArticle = async (req, res) => {
    try {
       const article = await Articles.findAll({
-         where: {
-            isDelete: null
-         },
          include: [
             {
                model: Users,
@@ -39,9 +36,6 @@ export const getAllArticleByUser = async (req, res) => {
       });
       if (user.roleId == 1) {
          const article = await Articles.findAll({
-            where: {
-               isDelete: null,
-            },
             include: [
                {
                   model: Users,
@@ -58,7 +52,6 @@ export const getAllArticleByUser = async (req, res) => {
       } else {
          const article = await Articles.findAll({
             where: {
-               isDelete: null,
                userId: req.params.id
             },
             include: [
@@ -86,8 +79,7 @@ export const getArticleById = async (req, res) => {
    try {
       const article = await Articles.findOne({
          where: {
-            id: req.params.id,
-            isDelete: null
+            id: req.params.id
          },
          include: [
             {
@@ -117,7 +109,7 @@ export const createArticle = async (req, res) => {
    const allowedType = ['.png', '.jpg', '.jpeg'];
 
    if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
-   if (fileSize > 5000000) return res.status(422).json({ msg: "Image must be less than 5 MB" });
+   if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran gambar harus kurang dari 5 MB" });
 
    file.mv(`./public/images/article/${fileName}`, async (err) => {
       if (err) return res.status(500).json({ msg: err.message });
@@ -129,8 +121,7 @@ export const createArticle = async (req, res) => {
             content,
             filePict: fileName,
             url,
-            isApprove,
-            isDelete: null,
+            isApprove
          });
          res.status(201).json({ msg: "Berhasil Membuat Article" });
       } catch (error) {
@@ -159,7 +150,7 @@ export const updateArticle = async (req, res) => {
       const allowedType = ['.png', '.jpg', '.jpeg'];
 
       if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
-      if (fileSize > 5000000) return res.status(422).json({ msg: "Image must be less than 5 MB" });
+      if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran gambar harus kurang dari 5 MB" });
 
       const filepath = `./public/images/article/${article.filePict}`;
       fs.unlinkSync(filepath);
@@ -170,7 +161,7 @@ export const updateArticle = async (req, res) => {
    }
 
    const { userId, destinationId, title, content, isApprove } = req.body;
-   const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
+   const url = `${req.protocol}://${req.get("host")}/images/article/${fileName}`;
 
    try {
       await Articles.update({
@@ -194,20 +185,44 @@ export const updateArticle = async (req, res) => {
    }
 }
 
-// Delete article
-export const deleteArticle = async (req, res) => {
+// Approve article
+export const approveArticle = async (req, res) => {
+   const article = await Articles.findOne({
+      where: {
+         id: req.params.id
+      }
+   });
+   if (!article) return res.status(404).json({ msg: "No Data Found" });
+
+   const { isApprove, note } = req.body;
    try {
-      const now = moment().format('Y-MM-DD HH:mm:ss');
-      console.log(now);
       await Articles.update({
-         isDelete: now,
+         isApprove,
+         note,
       }, {
          where: {
             id: req.params.id
          }
       });
       res.json({
-         "message": "Artikel Berhasil Dihapus"
+         "message": "Artikel Berhasil Disetujui"
+      });
+   } catch (error) {
+      res.json({ message: error.message });
+   }
+}
+
+// Delete article
+export const deleteArticle = async (req, res) => {
+   try {
+      const data = await Articles.findOne({
+         where: {
+            id: req.params.id
+         }
+      });
+      await data.softDelete();
+      res.json({
+         "message": "Data Artikel Berhasil Dihapus"
       });
    } catch (error) {
       res.json({ message: error.message });

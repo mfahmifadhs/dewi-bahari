@@ -3,17 +3,17 @@ import db from "../config/database.js";
 import Roles from "../models/roleModel.js";
 
 const { DataTypes } = Sequelize;
- 
-const Users = db.define('t_users',{
-    uuid:{
+
+const Users = db.define('t_users', {
+    uuid: {
         type: DataTypes.STRING,
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
-        validate:{
+        validate: {
             notEmpty: true
         }
     },
-    roleId:{
+    roleId: {
         type: DataTypes.INTEGER(11),
         allowNull: false,
         references: {
@@ -22,34 +22,47 @@ const Users = db.define('t_users',{
         },
         field: 'roleId'
     },
-    email:{
+    email: {
         type: DataTypes.STRING
     },
-    name:{
+    name: {
         type: DataTypes.STRING
     },
-    phoneNum:{
+    phoneNum: {
         type: DataTypes.BIGINT
     },
-    address:{
+    address: {
         type: DataTypes.TEXT
     },
-    password:{
+    password: {
         type: DataTypes.TEXT
     },
-    passwordText:{
+    passwordText: {
         type: DataTypes.TEXT
     },
-    refreshToken:{
+    refreshToken: {
         type: DataTypes.TEXT
     },
-    isDelete:{
-        type: DataTypes.STRING
+    deletedAt: {
+       type: DataTypes.DATE,
+       defaultValue: null
     }
-},{
-    freezeTableName: true
+}, {
+    freezeTableName: true,
+    defaultScope: {
+       where: { deletedAt: null }
+    }
 });
 
-Users.belongsTo(Roles, {foreignKey: 'roleId', targetKey: 'id'})
- 
+Users.prototype.softDelete = function () {
+    this.setDataValue('deletedAt', new Date());
+    return this.save();
+};
+
+Users.findAllDeleted = function () {
+    return this.unscoped().findAll({ where: { deletedAt: { [Sequelize.Op.ne]: null } } });
+};
+
+Users.belongsTo(Roles, { foreignKey: 'roleId', targetKey: 'id' })
+
 export default Users;

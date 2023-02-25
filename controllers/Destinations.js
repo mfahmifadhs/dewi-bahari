@@ -50,8 +50,7 @@ export const getAllArticleByDestination = async (req, res) => {
     try {
         const article = await Article.findAll({
             where: {
-                destinationId: req.params.id,
-                isDelete: null
+                destinationId: req.params.id
             },
             include: [
                 {
@@ -84,7 +83,7 @@ export const createDestination = async (req, res) => {
     const allowedType = ['.png', '.jpg', '.jpeg'];
 
     if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
-    if (fileSize > 5000000) return res.status(422).json({ msg: "Image must be less than 5 MB" });
+    if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran gambar harus kurang dari 5 MB" });
 
     file.mv(`./public/images/destination/${fileName}`, async (err) => {
         if (err) return res.status(500).json({ msg: err.message });
@@ -99,8 +98,7 @@ export const createDestination = async (req, res) => {
                 embMap,
                 userId,
                 filePict: fileName,
-                url,
-                isDelete: 'false'
+                url
             });
             res.status(201).json({ msg: "Berhasil Menambah Destinasi Wisata" });
         } catch (error) {
@@ -128,7 +126,7 @@ export const updateDestination = async (req, res) => {
         const allowedType = ['.png', '.jpg', '.jpeg'];
 
         if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
-        if (fileSize > 5000000) return res.status(422).json({ msg: "Image must be less than 5 MB" });
+        if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran gambar harus kurang dari 5 MB" });
 
         const filepath = `./public/images/destination/${dest.filePict}`;
         fs.unlinkSync(filepath);
@@ -138,7 +136,7 @@ export const updateDestination = async (req, res) => {
         });
     }
 
-    const { kdProv, kdKab, category, destination, address, description, embMap, userId, isDelete } = req.body;
+    const { kdProv, kdKab, category, destination, address, description, embMap, userId } = req.body;
     const url = `${req.protocol}://${req.get("host")}/images/destination/${fileName}`;
     console.log('body', req.body);
     try {
@@ -153,8 +151,7 @@ export const updateDestination = async (req, res) => {
             embMap,
             userId,
             filePict: fileName,
-            url: url,
-            isDelete
+            url: url
         }, {
             where: {
                 id: req.params.id
@@ -171,18 +168,19 @@ export const updateDestination = async (req, res) => {
 // Delete destination
 export const deleteDestination = async (req, res) => {
     try {
-        await Destination.destroy({
-            where: {
-                id: req.params.id
-            }
-        });
-        res.json({
-            "message": "Destination Deleted"
-        });
+       const data = await Destination.findOne({
+          where: {
+             id: req.params.id
+          }
+       });
+       await data.softDelete();
+       res.json({
+          "message": "Data Destinasi Berhasil Dihapus"
+       });
     } catch (error) {
-        res.json({ message: error.message });
+       res.json({ message: error.message });
     }
-}
+ }
 
 // Get all province
 export const getAllProvince = async (req, res) => {
@@ -215,3 +213,31 @@ export const getAllCity = async (req, res) => {
         console.log(error);
     }
 }
+
+// Approve Destination
+export const approveDestination = async (req, res) => {
+    const destination = await Destination.findOne({
+       where: {
+          id: req.params.id
+       }
+    });
+    if (!destination) return res.status(404).json({ msg: "No Data Found" });
+ 
+    const { isApprove, note } = req.body;
+    console.log(req.params.id);
+    try {
+       await Destination.update({
+          isApprove,
+          note
+       }, {
+          where: {
+             id: req.params.id
+          }
+       });
+       res.json({
+          "message": "Destinasi Wisata Berhasil Disetujui"
+       });
+    } catch (error) {
+       res.json({ message: error.message });
+    }
+ }
