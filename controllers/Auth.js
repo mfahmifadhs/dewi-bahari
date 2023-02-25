@@ -1,7 +1,6 @@
 import Users from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import argon2 from "argon2";
 
 export const Me = async (req, res) => {
    if (!req.session.userId) {
@@ -20,7 +19,8 @@ export const Me = async (req, res) => {
 export const Register = async (req, res) => {
    const { roleId, email, name, phoneNum, address, password, confPassword } = req.body;
    if (password !== confPassword) return res.status(400).json({ msg: "Password dan Confirm Password tidak cocok" });
-   const hashPassword = await argon2.hash(password);
+   const salt = await bcrypt.genSalt();
+   const hashPassword = await bcrypt.hash(password, salt);
    try {
       await Users.create({
          roleId,
@@ -44,10 +44,10 @@ export const Login = async (req, res) => {
       }
    });
    if (!user) return res.status(404).json({ msg: "User tidak ditemukan" });
-   const match = await argon2.verify(user.password, req.body.password);
+   const match = await bcrypt.compare(req.body.password, user.password);
    if (!match) return res.status(400).json({ msg: "Wrong Password" });
    // req.session.userId = user.uuid;
-   const id   = user.id;
+   const id = user.id;
    const uuid = user.uuid;
    const name = user.name;
    const email = user.email;
