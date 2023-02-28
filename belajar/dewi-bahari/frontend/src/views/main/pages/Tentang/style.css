@@ -1,0 +1,41 @@
+.tentang-content-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 50px 0px;
+  gap: 30px;
+}
+
+.tentang-text-container {
+  /* margin-left: 220px;
+  margin-right: 220px; */
+  padding: 0px 220px;
+}
+
+.tentang-text {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  text-align: justify;
+  text-indent: 10px;
+
+  color: #000000;
+}
+
+@media (max-width: 400px) {
+  .tentang-text-container {
+    /* margin-left: 220px;
+    margin-right: 220px; */
+    padding: 0px 30px;
+  }
+
+  .tentang-text {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 130%;
+    text-align: justify;
+    text-indent: 10px;
+
+    color: #000000;
+  }
+}

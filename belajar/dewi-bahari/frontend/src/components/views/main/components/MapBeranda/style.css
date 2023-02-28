@@ -1,0 +1,15 @@
+.map-beranda-container {
+  width: 1024px;
+  /* min-width: 1024px; */
+  height: 500px;
+  z-index: -1;
+}
+
+@media (max-width: 400px) {
+  .map-beranda-container {
+    width: 300px;
+    /* min-width: 1024px; */
+    height: 150px;
+    z-index: 1;
+  }
+}
