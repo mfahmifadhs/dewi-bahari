@@ -25,6 +25,31 @@ export const getAllDestination = async (req, res) => {
     }
 }
 
+export const getAllDestinationByUser = async (req, res) => {
+    try {
+        const dest = await Destination.findAll({
+            where: {
+                userId: req.params.id
+            },
+            include: [
+                {
+                    model: Users
+                }, {
+                    model: Province,
+                }, {
+                    model: Cities,
+                }
+            ],
+            order: [
+                ['createdAt', 'DESC']
+            ],
+        });
+        res.json(dest);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 // Get destination by id
 export const getDestinationById = async (req, res) => {
     try {
@@ -168,19 +193,19 @@ export const updateDestination = async (req, res) => {
 // Delete destination
 export const deleteDestination = async (req, res) => {
     try {
-       const data = await Destination.findOne({
-          where: {
-             id: req.params.id
-          }
-       });
-       await data.softDelete();
-       res.json({
-          "message": "Data Destinasi Berhasil Dihapus"
-       });
+        const data = await Destination.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        await data.softDelete();
+        res.json({
+            "message": "Data Destinasi Berhasil Dihapus"
+        });
     } catch (error) {
-       res.json({ message: error.message });
+        res.json({ message: error.message });
     }
- }
+}
 
 // Get all province
 export const getAllProvince = async (req, res) => {
@@ -217,27 +242,27 @@ export const getAllCity = async (req, res) => {
 // Approve Destination
 export const approveDestination = async (req, res) => {
     const destination = await Destination.findOne({
-       where: {
-          id: req.params.id
-       }
+        where: {
+            id: req.params.id
+        }
     });
     if (!destination) return res.status(404).json({ msg: "No Data Found" });
- 
+
     const { isApprove, note } = req.body;
     console.log(req.params.id);
     try {
-       await Destination.update({
-          isApprove,
-          note
-       }, {
-          where: {
-             id: req.params.id
-          }
-       });
-       res.json({
-          "message": "Destinasi Wisata Berhasil Disetujui"
-       });
+        await Destination.update({
+            isApprove,
+            note
+        }, {
+            where: {
+                id: req.params.id
+            }
+        });
+        res.json({
+            "message": "Destinasi Wisata Berhasil Disetujui"
+        });
     } catch (error) {
-       res.json({ message: error.message });
+        res.json({ message: error.message });
     }
- }
+}

@@ -29,45 +29,23 @@ export const getAllGallery = async (req, res) => {
 // Get gallery by user
 export const getAllGalleryByUser = async (req, res) => {
    try {
-      const user = await Users.findOne({
+      const gallery = await Galleries.findAll({
          where: {
-            id: req.params.id
-         }
-      });
-      if (user.roleId == 1) {
-         const gallery = await Galleries.findAll({
-            include: [
-               {
-                  model: Users,
-               },
-               {
-                  model: Destinations
-               }
-            ],
-            order: [
-               ['createdAt', 'DESC']
-            ],
-         });
-         res.json(gallery);
-      } else {
-         const gallery = await Galleries.findAll({
-            where: {
-               userId: req.params.id
+            userId: req.params.id
+         },
+         include: [
+            {
+               model: Users,
             },
-            include: [
-               {
-                  model: Users,
-               },
-               {
-                  model: Destinations
-               }
-            ],
-            order: [
-               ['createdAt', 'DESC']
-            ],
-         });
-         res.json(gallery);
-      }
+            {
+               model: Destinations
+            }
+         ],
+         order: [
+            ['createdAt', 'DESC']
+         ],
+      });
+      res.json(gallery);
    } catch (error) {
       console.log(error);
    }
