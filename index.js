@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import session from "express-session";
 import FileUpload from "express-fileupload";
-import db from "./config/Database.js";
+import db from "./config/database.js";
 import SequelizeStore from "connect-session-sequelize";
 import routeUser from "./routes/routeUser.js";
 import routeMenu from "./routes/routeMenu.js";
@@ -15,6 +15,7 @@ import routeArticle from "./routes/routeArticle.js";
 import routePartner from "./routes/routePartner.js";
 import routeGallery from "./routes/routeGallery.js";
 import routeGalleryDetail from "./routes/routeGalleryDetail.js";
+import routeBeranda from "./routes/frontend/routeBeranda.js";
 dotenv.config();
 
 const app = express();
@@ -49,5 +50,7 @@ app.use(routePartner);
 app.use(routeUser);
 app.use(routeAuth);
 app.use('/menu', routeMenu);
+app.use(routeBeranda);
+
 
 app.listen(5000, ()=> console.log('Server running at port 5000'));
