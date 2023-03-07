@@ -14,7 +14,7 @@ export const getAllArticle = async (req, res) => {
                model: Users,
             },
             {
-               model: Destinations
+               model: Destinations,
             }
          ],
          order: [
@@ -41,7 +41,8 @@ export const getAllArticleByUser = async (req, res) => {
                   model: Users,
                },
                {
-                  model: Destinations
+                  model: Destinations,
+                  required: false
                }
             ],
             order: [
@@ -59,7 +60,8 @@ export const getAllArticleByUser = async (req, res) => {
                   model: Users,
                },
                {
-                  model: Destinations
+                  model: Destinations,
+                  required: false
                }
             ],
             order: [
@@ -86,7 +88,8 @@ export const getArticleById = async (req, res) => {
                model: Users,
             },
             {
-               model: Destinations
+               model: Destinations,
+               required: false
             }
          ]
       });

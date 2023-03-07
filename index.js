@@ -15,6 +15,7 @@ import routeArticle from "./routes/routeArticle.js";
 import routePartner from "./routes/routePartner.js";
 import routeGallery from "./routes/routeGallery.js";
 import routeGalleryDetail from "./routes/routeGalleryDetail.js";
+import routeComponent from "./routes/routeComponent.js";
 dotenv.config();
 
 const app = express();
@@ -48,6 +49,7 @@ app.use(routeGalleryDetail);
 app.use(routePartner);
 app.use(routeUser);
 app.use(routeAuth);
+app.use(routeComponent);
 app.use('/menu', routeMenu);
 
 app.listen(5000, ()=> console.log('Server running at port 5000'));
