@@ -15,6 +15,7 @@ import routeArticle from "./routes/routeArticle.js";
 import routePartner from "./routes/routePartner.js";
 import routeGallery from "./routes/routeGallery.js";
 import routeGalleryDetail from "./routes/routeGalleryDetail.js";
+import routeComponent from "./routes/routeComponent.js";
 import routeBeranda from "./routes/frontend/routeBeranda.js";
 import routeProfil from "./routes/frontend/routeProfil.js";
 import routeDetailProfil from "./routes/frontend/routeDetailProfil.js";
@@ -51,6 +52,7 @@ app.use(routeGalleryDetail);
 app.use(routePartner);
 app.use(routeUser);
 app.use(routeAuth);
+app.use(routeComponent);
 app.use('/menu', routeMenu);
 
 app.use(routeBeranda);

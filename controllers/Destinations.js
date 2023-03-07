@@ -4,6 +4,9 @@ import Provinces from '../models/provinceModel.js';
 import Cities from '../models/cityModel.js';
 import Province from '../models/provinceModel.js';
 import Article from '../models/articleModel.js';
+import SocialMedia from '../models/socialMedia.js';
+import Officer from '../models/officerModel.js';
+import Facility from '../models/facilityModel.js';
 import path from 'path';
 import fs from 'fs';
 
@@ -25,6 +28,7 @@ export const getAllDestination = async (req, res) => {
     }
 }
 
+// Get all destination by user
 export const getAllDestinationByUser = async (req, res) => {
     try {
         const dest = await Destination.findAll({
@@ -71,6 +75,7 @@ export const getDestinationById = async (req, res) => {
     }
 }
 
+// Get all article by destination
 export const getAllArticleByDestination = async (req, res) => {
     try {
         const article = await Article.findAll({
@@ -98,8 +103,8 @@ export const getAllArticleByDestination = async (req, res) => {
 // Create destination
 export const createDestination = async (req, res) => {
     if (req.files === null) return res.status(400).json({ msg: "Tidak ada file yang di Upload." })
-
-    const { kdProv, kdKab, category, destination, address, description, embMap, userId } = req.body;
+    // Insert Destination
+    const { id, kdProv, kdKab, category, destination, address, description, embMap, userId } = req.body;
     const file = req.files.filePict;
     const fileSize = file.data.length;
     const ext = path.extname(file.name);
@@ -114,6 +119,7 @@ export const createDestination = async (req, res) => {
         if (err) return res.status(500).json({ msg: err.message });
         try {
             await Destination.create({
+                id: id,
                 kdProv,
                 kdKab,
                 category,
@@ -130,64 +136,152 @@ export const createDestination = async (req, res) => {
             console.log(error.message);
         }
     })
+
+    // Insert Facility
+    const facilityArr = [];
+    const facilityRegexPattern = /\[(\d+)\]\[value\]/;
+    Object.keys(req.body).forEach((key) => {
+        const match = key.match(facilityRegexPattern);
+        if (match !== null) {
+            const index = match[1];
+            const facility = req.body[key] || null;
+            if (facility !== null) {
+                facilityArr[index] = facility;
+            }
+        }
+    });
+
+    // Filter out undefined elements from the array
+    const filteredFacilitiesArr = facilityArr.filter((elem) => elem !== undefined);
+    for (let i = 0; i < filteredFacilitiesArr.length; i++) {
+        const facility = filteredFacilitiesArr[i];
+        console.log('dataFacility', facility);
+        try {
+            await Facility.create({
+                destinationId: id,
+                nameFacility: facility
+            });
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
+    // Insert Officer
+    const officersArr = [];
+    const officerRegexPattern = /officer\[(\d+)\]\[value\]/; // change the pattern
+    Object.keys(req.body).forEach((key) => {
+        const match = key.match(officerRegexPattern);
+        if (match !== null) {
+            const index = match[1];
+            const officer = req.body[`officer[${index}][value]`] || null; // change the key
+            if (officer !== null) {
+                officersArr[index] = officer;
+            }
+        }
+    });
+
+    // Filter out undefined elements from the array
+    const filteredOfficersArr = officersArr.filter((elem) => elem !== undefined);
+    for (let i = 0; i < filteredOfficersArr.length; i++) {
+        const officer = filteredOfficersArr[i];
+        console.log('data officer', officer);
+        try {
+            await Officer.create({
+                destinationId: id,
+                nameOfficer: officer
+            });
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
+    // Insert Social Media
+    const socialMediaArr = [];
+    const regexPattern = /\[(\d+)\]\[value\]/;
+    Object.keys(req.body).forEach((key) => {
+        const match = key.match(regexPattern);
+        if (match !== null) {
+            const index = match[1];
+            const socialMedia = req.body[`socialMedia[${index}][value]`] || null;
+            const link = req.body[`link[${index}][value]`] || null;
+            if (socialMedia !== null && link !== null) {
+                socialMediaArr[index] = { socialMedia, link };
+            }
+        }
+    });
+
+    // Filter out undefined elements from the array
+    const filteredArr = socialMediaArr.filter((elem) => elem !== undefined);
+
+    for (let i = 0; i < filteredArr.length; i++) {
+        const { socialMedia, link } = socialMediaArr[i];
+        try {
+            await SocialMedia.create({
+                destinationId: id,
+                socialMedia: socialMediaArr[i].socialMedia,
+                link: socialMediaArr[i].link
+            });
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
 }
 
 // Update destination
 export const updateDestination = async (req, res) => {
-    const dest = await Destination.findOne({
-        where: {
-            id: req.params.id
-        }
-    });
-    if (!dest) return res.status(404).json({ msg: "No Data Found" });
-    let fileName = "";
-    if (req.files === null) {
-        fileName = dest.filePict;
-    } else {
-        const file = req.files.filePict;
-        const fileSize = file.data.length;
-        const ext = path.extname(file.name);
-        fileName = file.md5 + ext;
-        const allowedType = ['.png', '.jpg', '.jpeg'];
+    console.log(req.body)
+    // const dest = await Destination.findOne({
+    //     where: {
+    //         id: req.params.id
+    //     }
+    // });
+    // if (!dest) return res.status(404).json({ msg: "No Data Found" });
+    // let fileName = "";
+    // if (req.files === null) {
+    //     fileName = dest.filePict;
+    // } else {
+    //     const file = req.files.filePict;
+    //     const fileSize = file.data.length;
+    //     const ext = path.extname(file.name);
+    //     fileName = file.md5 + ext;
+    //     const allowedType = ['.png', '.jpg', '.jpeg'];
 
-        if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
-        if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran gambar harus kurang dari 5 MB" });
+    //     if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
+    //     if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran gambar harus kurang dari 5 MB" });
 
-        const filepath = `./public/images/destination/${dest.filePict}`;
-        fs.unlinkSync(filepath);
+    //     const filepath = `./public/images/destination/${dest.filePict}`;
+    //     fs.unlinkSync(filepath);
 
-        file.mv(`./public/images/destination/${fileName}`, (err) => {
-            if (err) return res.status(500).json({ msg: err.message });
-        });
-    }
+    //     file.mv(`./public/images/destination/${fileName}`, (err) => {
+    //         if (err) return res.status(500).json({ msg: err.message });
+    //     });
+    // }
 
-    const { kdProv, kdKab, category, destination, address, description, embMap, userId } = req.body;
-    const url = `${req.protocol}://${req.get("host")}/images/destination/${fileName}`;
-    console.log('body', req.body);
-    try {
-        console.log('filename', fileName);
-        await Destination.update({
-            kdProv,
-            kdKab,
-            category,
-            destination,
-            address,
-            description,
-            embMap,
-            userId,
-            filePict: fileName,
-            url: url
-        }, {
-            where: {
-                id: req.params.id
-            }
-        });
-        res.json({
-            "message": "Destination Updated"
-        });
-    } catch (error) {
-        res.json({ message: error.message });
-    }
+    // const { kdProv, kdKab, category, destination, address, description, embMap, userId } = req.body;
+    // const url = `${req.protocol}://${req.get("host")}/images/destination/${fileName}`;
+    // try {
+    //     await Destination.update({
+    //         kdProv,
+    //         kdKab,
+    //         category,
+    //         destination,
+    //         address,
+    //         description,
+    //         embMap,
+    //         userId,
+    //         filePict: fileName,
+    //         url: url
+    //     }, {
+    //         where: {
+    //             id: req.params.id
+    //         }
+    //     });
+    //     res.json({
+    //         "message": "Destination Updated"
+    //     });
+    // } catch (error) {
+    //     res.json({ message: error.message });
+    // }
 }
 
 // Delete destination
@@ -249,7 +343,6 @@ export const approveDestination = async (req, res) => {
     if (!destination) return res.status(404).json({ msg: "No Data Found" });
 
     const { isApprove, note } = req.body;
-    console.log(req.params.id);
     try {
         await Destination.update({
             isApprove,
@@ -262,6 +355,48 @@ export const approveDestination = async (req, res) => {
         res.json({
             "message": "Destinasi Wisata Berhasil Disetujui"
         });
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
+
+// Get social media by id
+export const getSocialMediaById = async (req, res) => {
+    try {
+        const dest = await SocialMedia.findAll({
+            where: {
+                destinationId: req.params.id
+            }
+        });
+        res.json(dest);
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
+
+// Get officer media by id
+export const getOfficerById = async (req, res) => {
+    try {
+        const dest = await Officer.findAll({
+            where: {
+                destinationId: req.params.id
+            }
+        });
+        res.json(dest);
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
+
+// Get officer media by id
+export const getFacilityById = async (req, res) => {
+    try {
+        const dest = await Facility.findAll({
+            where: {
+                destinationId: req.params.id
+            }
+        });
+        res.json(dest);
     } catch (error) {
         res.json({ message: error.message });
     }
