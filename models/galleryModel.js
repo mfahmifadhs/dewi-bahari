@@ -1,21 +1,20 @@
 import { Sequelize } from "sequelize";
 import db from "../config/database.js";
-import Users from "../models/userModel.js";
-import Destination from "../models/destinationModel.js";
+import Destination from "./destinationModel.js";
 
 const { DataTypes } = Sequelize;
 
 const Gallery = db.define('t_galleries', {
-   userId: {
-      type: DataTypes.INTEGER
-   },
    destinationId: {
       type: DataTypes.INTEGER
    },
-   title: {
-      type: DataTypes.STRING
+   category: {
+      type: DataTypes.TEXT
    },
-   tag: {
+   filePict: {
+      type: DataTypes.TEXT
+   },
+   url: {
       type: DataTypes.TEXT
    },
    deletedAt: {
@@ -38,7 +37,6 @@ Gallery.findAllDeleted = function () {
    return this.unscoped().findAll({ where: { deletedAt: { [Sequelize.Op.ne]: null } } });
 };
 
-Gallery.belongsTo(Users, { foreignKey: 'userId', targetKey: 'id' })
 Gallery.belongsTo(Destination, { foreignKey: 'destinationId', targetKey: 'id' })
 
 export default Gallery;
