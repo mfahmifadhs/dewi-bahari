@@ -1,82 +1,51 @@
-import Galleries from '../models/galleryModel.js';
-import GalleriesDetail from '../models/galleryDetailModel.js';
+import Gallery from '../models/galleryModel.js';
 import Destinations from '../models/destinationModel.js';
 import Users from '../models/userModel.js';
+import moment from 'moment';
 import path from 'path';
+import fs from 'fs';
+import multer from 'multer';
 
-// Get all gallery
-export const getAllGallery = async (req, res) => {
+// Get data article by gallery id
+export const getGallery = async (req, res) => {
    try {
-      const gallery = await Galleries.findAll({
-         include: [
-            {
-               model: Users,
-            },
-            {
-               model: Destinations
-            }
-         ],
+      const data = await Gallery.findAll({
+         include: [{
+            model: Destinations
+         }],
          order: [
             ['createdAt', 'DESC']
          ],
       });
-      res.json(gallery);
+      res.json(data);
    } catch (error) {
       console.log(error);
    }
 }
 
-// Get gallery by user
-export const getAllGalleryByUser = async (req, res) => {
-   try {
-      const gallery = await Galleries.findAll({
-         where: {
-            userId: req.params.id
-         },
-         include: [
-            {
-               model: Users,
-            },
-            {
-               model: Destinations
-            }
-         ],
-         order: [
-            ['createdAt', 'DESC']
-         ],
-      });
-      res.json(gallery);
-   } catch (error) {
-      console.log(error);
-   }
-}
-
-
-// Get gallery by id
+// Get data detail article
 export const getGalleryById = async (req, res) => {
    try {
-      const gallery = await Galleries.findOne({
+      const data = await Gallery.findOne({
          where: {
             id: req.params.id
          },
-         include: [
-            {
-               model: Users,
-            },
-            {
-               model: Destinations
-            }
-         ]
+         include: [{
+            model: Destinations
+         }],
+         order: [
+            ['createdAt', 'DESC']
+         ],
       });
-      res.json(gallery);
+      res.json(data);
    } catch (error) {
-      res.json({ msg: "Data tidak tersedia" });
+      console.log(error);
    }
 }
 
 // Create gallery
 export const createGallery = async (req, res) => {
-   const { id, userId, destinationId, title } = req.body;
+   const { destinationId } = req.body;
    try {
       const file = req.files['selectedFiles[]']
       if (file.length >= 2) {
@@ -96,8 +65,8 @@ export const createGallery = async (req, res) => {
             value.mv(`./public/images/gallery/${fileName}`, async (err) => {
                if (err) return res.status(500).json({ msg: err.message });
                try {
-                  await GalleriesDetail.create({
-                     galleryId: id,
+                  await Gallery.create({
+                     destinationId,
                      category: ext != '.mp4' ? 'image' : 'video',
                      filePict: fileName,
                      url
@@ -124,8 +93,8 @@ export const createGallery = async (req, res) => {
          file.mv(`./public/images/gallery/${fileName}`, async (err) => {
             if (err) return res.status(500).json({ msg: err.message });
             try {
-               await GalleriesDetail.create({
-                  galleryId: id,
+               await Gallery.create({
+                  destinationId,
                   category: ext != '.mp4' ? 'image' : 'video',
                   filePict: fileName,
                   url
@@ -135,59 +104,81 @@ export const createGallery = async (req, res) => {
             }
          })
       }
-      await Galleries.create({
-         id,
-         userId,
-         destinationId,
-         title
-      });
       res.status(201).json({ msg: "Berhasil Menambah Galeri" });
    } catch (error) {
       console.log(error.message);
    }
 }
 
-// Update gallery
 export const updateGallery = async (req, res) => {
-   const gallery = await Galleries.findOne({
-      where: {
-         id: req.params.id
-      }
-   });
-   if (!gallery) return res.status(404).json({ msg: "No Data Found" });
-
-   const { id, userId, destinationId, category } = req.body;
-
    try {
-      await Galleries.update({
-         id,
-         userId,
+      const { destinationId, filePict } = req.body;
+      
+      const data = await Gallery.findOne({
+         where: {
+            id: req.params.id
+         }
+      });
+
+      // Update Detail Gallery
+      let fileName = "";
+      let file = "";
+      let ext = "";
+      if (req.files === null) {
+         console.log('true')
+         fileName = data.filePict;
+      } else {
+         console.log('false')
+         file = req.files.filePict;
+         const fileSize = file.data.length;
+         ext = path.extname(file.name);
+         fileName = file.md5 + ext;
+         const allowedType = ['.png', '.jpg', '.jpeg', '.mp4'];
+         if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
+         if (ext != '.mp4') {
+            if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran file lebih dari 5 MB!" });
+         } else {
+            if (fileSize > 50000000) return res.status(422).json({ msg: "Ukuran file lebih dari 50 MB!" });
+         }
+         const filepath = `./public/images/gallery/${data.filePict}`;
+         fs.unlinkSync(filepath);
+
+         file.mv(`./public/images/gallery/${fileName}`, (err) => {
+            if (err) return res.status(500).json({ msg: err.message });
+         });
+      }
+
+      const url = `${req.protocol}://${req.get("host")}/images/gallery/${fileName}`;
+      await Gallery.update({
          destinationId,
-         category
+         category: ext != '.mp4' ? 'image' : 'video',
+         filePict: fileName,
+         url,
       }, {
          where: {
             id: req.params.id
          }
       });
       res.json({
-         "message": "Galeri Berhasil Diubah"
+         msg: "Data Berhasil Diupdate"
       });
    } catch (error) {
-      res.json({ message: error.message });
+      // console.log(error);
    }
 }
 
-// Delete gallery
+
+// Delete detail gallery
 export const deleteGallery = async (req, res) => {
    try {
-      const data = await Galleries.findOne({
+      const data = await Gallery.findOne({
          where: {
             id: req.params.id
          }
       });
       await data.softDelete();
       res.json({
-         msg: "Data Berhasil Dihapus"
+         msg: "Data File Berhasil Dihapus"
       });
    } catch (error) {
       res.json({ message: error.message });

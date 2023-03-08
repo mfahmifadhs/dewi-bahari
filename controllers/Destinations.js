@@ -229,59 +229,162 @@ export const createDestination = async (req, res) => {
 
 // Update destination
 export const updateDestination = async (req, res) => {
-    console.log(req.body)
-    // const dest = await Destination.findOne({
-    //     where: {
-    //         id: req.params.id
-    //     }
-    // });
-    // if (!dest) return res.status(404).json({ msg: "No Data Found" });
-    // let fileName = "";
-    // if (req.files === null) {
-    //     fileName = dest.filePict;
-    // } else {
-    //     const file = req.files.filePict;
-    //     const fileSize = file.data.length;
-    //     const ext = path.extname(file.name);
-    //     fileName = file.md5 + ext;
-    //     const allowedType = ['.png', '.jpg', '.jpeg'];
+    const dest = await Destination.findOne({
+        where: {
+            id: req.params.id
+        }
+    });
+    if (!dest) return res.status(404).json({ msg: "No Data Found" });
+    let fileName = "";
+    if (req.files === null) {
+        fileName = dest.filePict;
+    } else {
+        const file = req.files.filePict;
+        const fileSize = file.data.length;
+        const ext = path.extname(file.name);
+        fileName = file.md5 + ext;
+        const allowedType = ['.png', '.jpg', '.jpeg'];
 
-    //     if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
-    //     if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran gambar harus kurang dari 5 MB" });
+        if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
+        if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran gambar harus kurang dari 5 MB" });
 
-    //     const filepath = `./public/images/destination/${dest.filePict}`;
-    //     fs.unlinkSync(filepath);
+        const filepath = `./public/images/destination/${dest.filePict}`;
+        fs.unlinkSync(filepath);
 
-    //     file.mv(`./public/images/destination/${fileName}`, (err) => {
-    //         if (err) return res.status(500).json({ msg: err.message });
-    //     });
-    // }
+        file.mv(`./public/images/destination/${fileName}`, (err) => {
+            if (err) return res.status(500).json({ msg: err.message });
+        });
+    }
 
-    // const { kdProv, kdKab, category, destination, address, description, embMap, userId } = req.body;
-    // const url = `${req.protocol}://${req.get("host")}/images/destination/${fileName}`;
-    // try {
-    //     await Destination.update({
-    //         kdProv,
-    //         kdKab,
-    //         category,
-    //         destination,
-    //         address,
-    //         description,
-    //         embMap,
-    //         userId,
-    //         filePict: fileName,
-    //         url: url
-    //     }, {
-    //         where: {
-    //             id: req.params.id
-    //         }
-    //     });
-    //     res.json({
-    //         "message": "Destination Updated"
-    //     });
-    // } catch (error) {
-    //     res.json({ message: error.message });
-    // }
+    const { kdProv, kdKab, category, destination, address, description, embMap, userId } = req.body;
+    const url = `${req.protocol}://${req.get("host")}/images/destination/${fileName}`;
+    try {
+        await Destination.update({
+            kdProv,
+            kdKab,
+            category,
+            destination,
+            address,
+            description,
+            embMap,
+            userId,
+            filePict: fileName,
+            url: url
+        }, {
+            where: {
+                id: req.params.id
+            }
+        });
+        res.json({
+            "message": "Destination Updated"
+        });
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+        
+    // Update Facility
+    const facilityArr = [];
+    const facilityRegexPattern = /\[(\d+)\]\[socialMedia\]/;
+    Object.keys(req.body).forEach((key) => {
+        const match = key.match(facilityRegexPattern);
+        if (match !== null) {
+            const index = match[1];
+            const idFacility = req.body[`facility[${index}][id]`] || null;
+            const destinationId = req.body[`facility[${index}][destinationId]`] || null;
+            const facility = req.body[`facility[${index}][nameFacility]`] || null;
+            if (idFacility !== null && destinationId !== null && facility !== null) {
+                facilityArr[index] = { idFacility, destinationId, facility };
+            }
+        }
+    });
+
+    // Filter out undefined elements from the array
+    const filteredFacilitiesArr = facilityArr.filter((elem) => elem !== undefined);
+    console.log('dataFacility', filteredFacilitiesArr)
+    for (let i = 0; i < filteredFacilitiesArr.length; i++) {
+        const { idFacility, destinationId, facility } = facilityArr[i];
+        try {
+            await Facility.update({
+                destinationId,
+                nameFacility: facility
+             }, {
+                where: {
+                   id: idFacility
+                }
+             });
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
+    // Update Officer
+    const officersArr = [];
+    const officerRegexPattern = /\[(\d+)\]\[socialMedia\]/;
+    console.log('data', req.body)
+    Object.keys(req.body).forEach((key) => {
+        const match = key.match(officerRegexPattern);
+        if (match !== null) {
+            const index = match[1];
+            const idOfficer = req.body[`officer[${index}][id]`] || null;
+            const destinationId = req.body[`officer[${index}][destinationId]`] || null;
+            const officer = req.body[`officer[${index}][nameOfficer]`] || null;
+            if (idOfficer !== null && destinationId !== null && officer !== null) {
+                officersArr[index] = { idOfficer, destinationId, officer };
+            }
+        }
+    });
+    
+    const filteredOfficersArr = officersArr.filter((elem) => elem !== undefined);
+    for (let i = 0; i < filteredOfficersArr.length; i++) {
+        const { idOfficer, destinationId, officer } = officersArr[i];
+        try {
+            await Officer.update({
+                destinationId,
+                nameOfficer: officer
+             }, {
+                where: {
+                   id: idOfficer
+                }
+             });
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
+    // Update Social Media
+    const socialMediaArr = [];
+    const regexPattern = /\[(\d+)\]\[socialMedia\]/;
+    Object.keys(req.body).forEach((key) => {
+        const match = key.match(regexPattern);
+        if (match !== null) {
+            const index = match[1];
+            const idSocialMedia = req.body[`socialMedia[${index}][id]`] || null;
+            const destinationId = req.body[`socialMedia[${index}][destinationId]`] || null;
+            const socialMedia = req.body[`socialMedia[${index}][socialMedia]`] || null;
+            const link = req.body[`socialMedia[${index}][link]`] || null;
+            if (socialMedia !== null && link !== null) {
+                socialMediaArr[index] = { idSocialMedia, destinationId, socialMedia, link };
+            }
+        }
+    });
+
+    const filteredArr = socialMediaArr.filter((elem) => elem !== undefined);
+    for (let i = 0; i < filteredArr.length; i++) {
+        const { idSocialMedia, destinationId, socialMedia, link } = socialMediaArr[i];
+        try {
+            await SocialMedia.update({
+                destinationId,
+                socialMedia,
+                link
+             }, {
+                where: {
+                   id: idSocialMedia
+                }
+             });
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
 }
 
 // Delete destination

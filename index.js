@@ -14,7 +14,6 @@ import routeDestination from "./routes/routeDestination.js";
 import routeArticle from "./routes/routeArticle.js";
 import routePartner from "./routes/routePartner.js";
 import routeGallery from "./routes/routeGallery.js";
-import routeGalleryDetail from "./routes/routeGalleryDetail.js";
 import routeComponent from "./routes/routeComponent.js";
 dotenv.config();
 
@@ -45,7 +44,6 @@ app.use(routeAccess);
 app.use(routeArticle);
 app.use(routeDestination);
 app.use(routeGallery);
-app.use(routeGalleryDetail);
 app.use(routePartner);
 app.use(routeUser);
 app.use(routeAuth);
