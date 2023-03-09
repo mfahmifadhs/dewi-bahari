@@ -1,7 +1,7 @@
 import Article from "../../models/articleModel.js";
 import City from "../../models/cityModel.js";
 import Destination from "../../models/destinationModel.js"
-import GalleryDetail from "../../models/galleryDetailModel.js";
+// import GalleryDetail from "../../models/galleryDetailModel.js";
 import Gallery from "../../models/galleryModel.js";
 import Officer from "../../models/officerModel.js";
 import Province from "../../models/provinceModel.js";
@@ -26,31 +26,31 @@ export const getDetailLocation = async (req, res) => {
             },
         })
 
-        const galleryName = await Gallery.findAll({
-            where: {
-                destinationId: req.params.id
-            },
-        })
+        // const galleryName = await Gallery.findAll({
+        //     where: {
+        //         destinationId: req.params.id
+        //     },
+        // })
 
 
-        const getGalleryImage = async (id) => {
-            const image = await GalleryDetail.findAll({
-                where: {
-                    galleryId: id
-                },
-            })
-            return image
-        }
+        // const getGalleryImage = async (id) => {
+        //     const image = await GalleryDetail.findAll({
+        //         where: {
+        //             galleryId: id
+        //         },
+        //     })
+        //     return image
+        // }
 
-        const galleries = await Promise.all(
-            galleryName.map(async (gallery) => {
-                const images = await getGalleryImage(gallery.id);
-                return {
-                    title: gallery.title,
-                    images: images,
-                };
-            })
-        )
+        // const galleries = await Promise.all(
+        //     galleryName.map(async (gallery) => {
+        //         const images = await getGalleryImage(gallery.id);
+        //         return {
+        //             title: gallery.title,
+        //             images: images,
+        //         };
+        //     })
+        // )
 
         const pengelola = await Officer.findAll({
             where: {
@@ -69,7 +69,7 @@ export const getDetailLocation = async (req, res) => {
             ...data.toJSON(),
             province: province.toJSON().province,
             city: city.toJSON().city,
-            gallery: galleries,
+            // gallery: galleries,
             pengelola: pengelola,
             article: article,
         });
