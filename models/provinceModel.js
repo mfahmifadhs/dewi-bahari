@@ -8,7 +8,10 @@ const Province = db.define('t_provinces', {
     province: {
         type: DataTypes.STRING
     },
-}, {
+    position:{
+        type: DataTypes.JSON
+    },
+},{
     freezeTableName: true
 });
 

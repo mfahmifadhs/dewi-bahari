@@ -8,13 +8,7 @@ const Gallery = db.define('t_galleries', {
    destinationId: {
       type: DataTypes.INTEGER
    },
-   category: {
-      type: DataTypes.TEXT
-   },
-   filePict: {
-      type: DataTypes.TEXT
-   },
-   url: {
+   nameGallery: {
       type: DataTypes.TEXT
    },
    deletedAt: {

@@ -1,4 +1,5 @@
 import Gallery from '../models/galleryModel.js';
+import GalleryDetail from '../models/galleryDetailModel.js';
 import Destinations from '../models/destinationModel.js';
 import Users from '../models/userModel.js';
 import moment from 'moment';
@@ -43,10 +44,76 @@ export const getGalleryById = async (req, res) => {
    }
 }
 
-// Create gallery
+// Create Gallery
 export const createGallery = async (req, res) => {
-   const { destinationId } = req.body;
-   try {
+   const { id, destinationId, nameGallery } = req.body;
+
+   if (nameGallery == 'atraction') {
+      const file = req.files['selectedFiles[]']
+      if (file.length >= 2) {
+         file.map((value, index) => {
+            const fileSize = value.data.length;
+            const ext = path.extname(value.name);
+            const fileName = value.md5 + ext;
+            const url = `${req.protocol}://${req.get("host")}/images/gallery/atraction/${fileName}`;
+            const allowedType = ['.png', '.jpg', '.jpeg', '.mp4'];
+
+            if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
+            if (ext != '.mp4') {
+               if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran file lebih dari 5 MB!" });
+            } else {
+               if (fileSize > 50000000) return res.status(422).json({ msg: "Ukuran file lebih dari 50 MB!" });
+            }
+            value.mv(`./public/images/gallery/atraction/${fileName}`, async (err) => {
+               if (err) return res.status(500).json({ msg: err.message });
+               const title = req.body[`title[${index}][value]`] || null;
+               try {
+                  await GalleryDetail.create({
+                     galleryId: id,
+                     title,
+                     category: ext != '.mp4' ? 'image' : 'video',
+                     filePict: fileName,
+                     url
+                  });
+               } catch (error) {
+                  console.log(error.message);
+               }
+            })
+         })
+      } else {
+         const fileSize = file.data.length;
+         const ext = path.extname(file.name);
+         const fileName = file.md5 + ext;
+         const url = `${req.protocol}://${req.get("host")}/images/gallery/atraction/${fileName}`;
+         const allowedType = ['.png', '.jpg', '.jpeg', '.mp4'];
+
+         if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
+         if (ext != '.mp4') {
+            if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran file lebih dari 5 MB!" });
+         } else {
+            if (fileSize > 50000000) return res.status(422).json({ msg: "Ukuran file lebih dari 50 MB!" });
+         }
+
+         file.mv(`./public/images/gallery/atraction/${fileName}`, async (err) => {
+            if (err) return res.status(500).json({ msg: err.message });
+            const title = req.body[`title[${0}][value]`] || null;
+            try {
+               await GalleryDetail.create({
+                  galleryId: id,
+                  title,
+                  category: ext != '.mp4' ? 'image' : 'video',
+                  filePict: fileName,
+                  url
+               });
+            } catch (error) {
+               console.log(error.message);
+            }
+         })
+      }
+
+   } 
+   
+   if (nameGallery == 'gallery') {
       const file = req.files['selectedFiles[]']
       if (file.length >= 2) {
          file.map((value, index) => {
@@ -65,8 +132,9 @@ export const createGallery = async (req, res) => {
             value.mv(`./public/images/gallery/${fileName}`, async (err) => {
                if (err) return res.status(500).json({ msg: err.message });
                try {
-                  await Gallery.create({
-                     destinationId,
+                  await GalleryDetail.create({
+                     galleryId: id,
+                     title: null,
                      category: ext != '.mp4' ? 'image' : 'video',
                      filePict: fileName,
                      url
@@ -93,8 +161,9 @@ export const createGallery = async (req, res) => {
          file.mv(`./public/images/gallery/${fileName}`, async (err) => {
             if (err) return res.status(500).json({ msg: err.message });
             try {
-               await Gallery.create({
-                  destinationId,
+               await GalleryDetail.create({
+                  galleryId: id,
+                  title: null,
                   category: ext != '.mp4' ? 'image' : 'video',
                   filePict: fileName,
                   url
@@ -104,71 +173,51 @@ export const createGallery = async (req, res) => {
             }
          })
       }
+   }
+
+   try {
+      await Gallery.create({
+         id,
+         destinationId,
+         nameGallery
+      });
       res.status(201).json({ msg: "Berhasil Menambah Galeri" });
    } catch (error) {
       console.log(error.message);
    }
+
 }
 
+// Update Gallery
 export const updateGallery = async (req, res) => {
-   try {
-      const { destinationId, filePict } = req.body;
-      
-      const data = await Gallery.findOne({
-         where: {
-            id: req.params.id
-         }
-      });
-
-      // Update Detail Gallery
-      let fileName = "";
-      let file = "";
-      let ext = "";
-      if (req.files === null) {
-         console.log('true')
-         fileName = data.filePict;
-      } else {
-         console.log('false')
-         file = req.files.filePict;
-         const fileSize = file.data.length;
-         ext = path.extname(file.name);
-         fileName = file.md5 + ext;
-         const allowedType = ['.png', '.jpg', '.jpeg', '.mp4'];
-         if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
-         if (ext != '.mp4') {
-            if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran file lebih dari 5 MB!" });
-         } else {
-            if (fileSize > 50000000) return res.status(422).json({ msg: "Ukuran file lebih dari 50 MB!" });
-         }
-         const filepath = `./public/images/gallery/${data.filePict}`;
-         fs.unlinkSync(filepath);
-
-         file.mv(`./public/images/gallery/${fileName}`, (err) => {
-            if (err) return res.status(500).json({ msg: err.message });
-         });
+   const gallery = await Gallery.findOne({
+      where: {
+         id: req.params.id
       }
+   });
+   if (!gallery) return res.status(404).json({ msg: "No Data Found" });
 
-      const url = `${req.protocol}://${req.get("host")}/images/gallery/${fileName}`;
+   const { destinationId, nameGallery } = req.body;
+
+   try {
       await Gallery.update({
          destinationId,
-         category: ext != '.mp4' ? 'image' : 'video',
-         filePict: fileName,
-         url,
+         nameGallery
       }, {
          where: {
             id: req.params.id
          }
       });
       res.json({
-         msg: "Data Berhasil Diupdate"
+         "message": "Galeri Berhasil Diubah"
       });
    } catch (error) {
-      // console.log(error);
+      res.json({ message: error.message });
    }
 }
 
 
-// Delete detail gallery
+// Delete Gallery
 export const deleteGallery = async (req, res) => {
    try {
       const data = await Gallery.findOne({
