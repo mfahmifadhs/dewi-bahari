@@ -12,13 +12,29 @@ export const getDescription = async (req, res) => {
         })
         result.push({title: "Kementrian / Lembaga", desc: description.toJSON().description})
         
-        const mitra = await Partner.findAll({
+        const pemda = await Partner.findAll({
             attributes: ['id', 'partner', 'url'],
             where: {
                 category: 'Pemerintah Daerah'
             }
         })
-        result.push({title: "Pemerintah Daerah", mitra: mitra})
+        result.push({title: "Pemerintah Daerah", mitra: pemda})
+
+        const NGO = await Partner.findAll({
+            attributes: ['id', 'partner', 'url'],
+            where: {
+                category: 'Non-Government Organization'
+            }
+        })
+        result.push({title: "Non-Government Organization", mitra: NGO})
+
+        const PS = await Partner.findAll({
+            attributes: ['id', 'partner', 'url'],
+            where: {
+                category: 'Private Sector'
+            }
+        })
+        result.push({title: "Private Sector", mitra: PS})
         
         return res.json(result);
     } catch (error) {
