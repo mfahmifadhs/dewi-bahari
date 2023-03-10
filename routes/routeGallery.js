@@ -1,6 +1,6 @@
 import express from "express";
 import { createGallery, deleteGallery, getGallery, getGalleryById, updateGallery } from "../controllers/Gallery.js";
-import { deleteDetailGallery, getDetailGallery, getDetailGalleryById } from "../controllers/GalleryDetail.js";
+import { deleteDetailGallery, getDetailGallery, getDetailGalleryById, updateDetailGallery } from "../controllers/GalleryDetail.js";
 
 const routeGallery = express.Router();
 
@@ -12,7 +12,7 @@ routeGallery.delete('/gl/:id', deleteGallery);
 
 routeGallery.get('/gd/:id', getDetailGallery);
 routeGallery.get('/gd/detail/:id', getDetailGalleryById);
-routeGallery.patch('/gd/update/:galleryId/:id', updateGallery);
+routeGallery.patch('/gd/update/:galleryId/:id', updateDetailGallery);
 routeGallery.delete('/gd/:id', deleteDetailGallery);
 
 export default routeGallery;

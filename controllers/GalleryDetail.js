@@ -1,11 +1,11 @@
 import Gallery from '../models/galleryModel.js';
 import GalleryDetail from '../models/galleryDetailModel.js';
-import Destinations from '../models/destinationModel.js';
 import Users from '../models/userModel.js';
 import moment from 'moment';
 import path from 'path';
 import fs from 'fs';
 import multer from 'multer';
+import Destination from '../models/destinationModel.js';
 
 // Get data article by gallery id
 export const getDetailGallery = async (req, res) => {
@@ -39,6 +39,16 @@ export const getDetailGalleryById = async (req, res) => {
          include: [
             {
                model: Gallery,
+               include: [
+                  {
+                     model: Destination,
+                     include: [
+                        {
+                           model: Users
+                        }
+                     ]
+                  }
+               ]
             }
          ],
          order: [
@@ -53,12 +63,11 @@ export const getDetailGalleryById = async (req, res) => {
 
 export const updateDetailGallery = async (req, res) => {
    try {
-      const { userId, destinationId, title, filePict } = req.body;
+      const { destinationId, nameGallery, title } = req.body;
       // Update Gallery
       await Gallery.update({
-         userId,
          destinationId,
-         title,
+         nameGallery,
       }, {
          where: {
             id: req.params.galleryId
@@ -75,6 +84,7 @@ export const updateDetailGallery = async (req, res) => {
       let fileName = "";
       let file = "";
       let ext = "";
+      let url = "";
       if (req.files === null) {
          console.log('true')
          fileName = detail.filePict;
@@ -91,15 +101,28 @@ export const updateDetailGallery = async (req, res) => {
          } else {
             if (fileSize > 50000000) return res.status(422).json({ msg: "Ukuran file lebih dari 50 MB!" });
          }
-         const filepath = `./public/images/gallery/${detail.filePict}`;
-         fs.unlinkSync(filepath);
 
-         file.mv(`./public/images/gallery/${fileName}`, (err) => {
-            if (err) return res.status(500).json({ msg: err.message });
-         });
+         if (nameGallery == 'atraction') {
+            const filepath = `./public/images/gallery/atraction/${detail.filePict}`;
+            fs.unlinkSync(filepath);
+
+            file.mv(`./public/images/gallery/atraction/${fileName}`, (err) => {
+               if (err) return res.status(500).json({ msg: err.message });
+            });
+      
+            url = `${req.protocol}://${req.get("host")}/images/gallery/atraction/${fileName}`;
+         } else {
+            const filepath = `./public/images/gallery/${detail.filePict}`;
+            fs.unlinkSync(filepath);
+
+            file.mv(`./public/images/gallery/${fileName}`, (err) => {
+               if (err) return res.status(500).json({ msg: err.message });
+            });
+      
+            url = `${req.protocol}://${req.get("host")}/images/gallery/${fileName}`;
+         }
       }
 
-      const url = `${req.protocol}://${req.get("host")}/images/gallery/${fileName}`;
       await GalleryDetail.update({
          galleryId: req.params.galleryId,
          category: ext != '.mp4' ? 'image' : 'video',

@@ -195,7 +195,6 @@ export const updateGallery = async (req, res) => {
          id: req.params.id
       }
    });
-   console.log(gallery)
    if (!gallery) return res.status(404).json({ msg: "No Data Found" });
 
    const { destinationId, nameGallery } = req.body;
