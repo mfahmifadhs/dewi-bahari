@@ -15,7 +15,7 @@ export const getDetailLocation = async (req, res) => {
             where: {
                 id: req.params.id
             },
-            attributes: ['id','userId', 'kdProv', 'destination', 'address', 'url', 'description', 'embMap'],
+            attributes: ['id','userId', 'kdProv','kdKab', 'destination', 'address', 'url', 'description', 'embMap'],
         })
 
         const admin = await Users.findOne({
@@ -43,7 +43,7 @@ export const getDetailLocation = async (req, res) => {
         })
         const city = await City.findOne({
             where: {
-                id: province.toJSON().id
+                id: data.toJSON().kdKab
             },
         })
 

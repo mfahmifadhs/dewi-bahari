@@ -25,6 +25,7 @@ import routeDetailArtikel from "./routes/frontend/routeDetailArtikel.js";
 import routeMitra from "./routes/frontend/routeMitra.js";
 import routeArtikel from "./routes/frontend/routeArtikel.js";
 import routeMap from "./routes/frontend/routeMap.js";
+import routeGalleryFront from "./routes/frontend/routeGallery.js";
 dotenv.config();
 
 const app = express();
@@ -70,6 +71,7 @@ app.use(routeDetailArtikel);
 app.use(routeMitra);
 app.use(routeArtikel);
 app.use(routeMap);
+app.use(routeGalleryFront);
 
 
 app.listen(5000, ()=> console.log('Server running at port 5000'));
