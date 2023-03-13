@@ -101,6 +101,9 @@ export const getAllArticleByDestination = async (req, res) => {
 }
 
 // Create destination
+// export const createDestination = async (req, res) => {
+//     console.log(req.body)
+// }
 export const createDestination = async (req, res) => {
     if (req.files === null) return res.status(400).json({ msg: "Tidak ada file yang di Upload." })
     // Insert Destination
@@ -139,7 +142,7 @@ export const createDestination = async (req, res) => {
 
     // Insert Facility
     const facilityArr = [];
-    const facilityRegexPattern = /\[(\d+)\]\[value\]/;
+    const facilityRegexPattern = /facility\[(\d+)\]\[value\]/; // change the pattern
     Object.keys(req.body).forEach((key) => {
         const match = key.match(facilityRegexPattern);
         if (match !== null) {
@@ -443,6 +446,7 @@ export const approveDestination = async (req, res) => {
             id: req.params.id
         }
     });
+    console.log(destination)
     if (!destination) return res.status(404).json({ msg: "No Data Found" });
 
     const { isApprove, note } = req.body;
