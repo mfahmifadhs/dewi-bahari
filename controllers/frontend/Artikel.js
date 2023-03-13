@@ -3,10 +3,13 @@ import Article from "../../models/articleModel.js";
 export const getAllArticle = async (req, res) => {
     try {
         const data = await Article.findAll({
-            attributes: ['id', 'title', 'content','url'],
+            attributes: ['id', 'title', 'content', 'url'],
             order: [
                 ['createdAt', 'DESC']
-             ],
+            ],
+            where: {
+                isApprove: true
+            }
         })
 
         return res.json(data);

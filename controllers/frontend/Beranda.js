@@ -8,6 +8,9 @@ export const getLocation = async (req, res) => {
     try {
         const data = await Destination.findAll({
             attributes: ['id', 'kdProv', 'kdKab', 'destination', 'url'],
+            where: {
+                isApprove: true
+            }
         })
 
         const result = await Promise.all(
@@ -44,7 +47,10 @@ export const getLatestArticle = async (req, res) => {
             order: [
                 ['createdAt', 'DESC']
             ],
-            limit: 5
+            limit: 5,
+            where: {
+                isApprove: true
+            }
         });
 
         return res.json(data);

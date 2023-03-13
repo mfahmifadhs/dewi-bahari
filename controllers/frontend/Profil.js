@@ -6,6 +6,9 @@ export const getLocation = async (req, res) => {
     try {
         const data = await Destination.findAll({
             attributes: ['id', 'kdProv', 'kdKab', 'destination', 'url'],
+            where: {
+                isApprove: true
+            }
         })
 
         const result = await Promise.all(

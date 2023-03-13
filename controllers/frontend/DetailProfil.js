@@ -13,9 +13,10 @@ export const getDetailLocation = async (req, res) => {
     try {
         const data = await Destination.findOne({
             where: {
-                id: req.params.id
+                id: req.params.id,
+                isApprove: true
             },
-            attributes: ['id','userId', 'kdProv','kdKab', 'destination', 'address', 'url', 'description', 'embMap'],
+            attributes: ['id','userId', 'kdProv','kdKab', 'destination', 'address', 'url', 'description', 'embMap']
         })
 
         const admin = await Users.findOne({
