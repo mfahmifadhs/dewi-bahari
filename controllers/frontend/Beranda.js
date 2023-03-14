@@ -3,15 +3,34 @@ import City from "../../models/cityModel.js";
 import Component from "../../models/componentModel.js";
 import Destination from "../../models/destinationModel.js"
 import Province from "../../models/provinceModel.js";
+import Recomendation from '../../models/recomendationModel.js';
 
 export const getLocation = async (req, res) => {
     try {
-        const data = await Destination.findAll({
-            attributes: ['id', 'kdProv', 'kdKab', 'destination', 'url'],
-            where: {
-                isApprove: true
-            }
+        const recomendation = await Recomendation.findAll({
+            attributes: ['destinationId'],
         })
+        const destinationId = recomendation.filter(item => item.destinationId != null && item.destinationId != 0) ;
+
+        const data = await Promise.all(
+            destinationId.map(async (item) => {
+                const data = await Destination.findOne({
+                    attributes: ['id', 'kdProv', 'kdKab', 'destination', 'url'],
+                    where: {
+                        id: item.destinationId,
+                        isApprove: true
+                    }
+                })
+                return data
+            })
+        )
+
+        // const data = await Destination.findAll({
+        //     attributes: ['id', 'kdProv', 'kdKab', 'destination', 'url'],
+        //     where: {
+        //         isApprove: true
+        //     }
+        // })
 
         const result = await Promise.all(
             data.map(async (item) => {
