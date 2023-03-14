@@ -20,7 +20,8 @@ export const getAllDestination = async (req, res) => {
                 model: Province,
             }, {
                 model: Cities,
-            }]
+            }],
+            order: [['destination','ASC']]
         });
         res.json(dest);
     } catch (error) {

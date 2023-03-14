@@ -14,6 +14,12 @@ import {
    getSocialMediaById, 
    updateDestination 
 } from "../controllers/Destinations.js";
+import { 
+   getAllDestByRc, 
+   getAllRecomendation, 
+   getRecomendationById, 
+   updateRecomendation 
+} from "../controllers/Recomendation.js";
 import { superAdminOnly } from "../middleware/VerifyUser.js";
 
 const routeDestination = express.Router();
@@ -37,5 +43,10 @@ routeDestination.get('/sc/dt/:id', getSocialMediaById);
 routeDestination.get('/oc/dt/:id', getOfficerById);
 // Get facility by dest
 routeDestination.get('/fc/dt/:id', getFacilityById);
+// Get facility by dest
+routeDestination.get('/rc', getAllRecomendation);
+routeDestination.get('/rc/:id', getRecomendationById);
+routeDestination.patch('/rc/:id', updateRecomendation);
+routeDestination.get('/rc/dt/all', getAllDestByRc);
 
 export default routeDestination;
