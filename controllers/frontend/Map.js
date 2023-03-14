@@ -5,7 +5,10 @@ export const getMapData = async (req, res) => {
     try {
         const destination = await Destination.findAll({
             attributes: ['kdProv'],
-            group: ['kdProv']
+            group: ['kdProv'],
+            where: {
+                isApprove: true
+            }
         })
 
         const result = await Promise.all(destination.map(async (item) => {
