@@ -54,9 +54,7 @@ export const getAllDestByRc = async (req, res) => {
       const destinationIds = recomend.map((recom) => recom.destinationId);
       const destination = await Destination.findAll({
          where: {
-            id: {
-               [Sequelize.Op.notIn]: destinationIds
-            }
+            isApprove: true
          },
          include: [{
             model: Users
@@ -65,9 +63,11 @@ export const getAllDestByRc = async (req, res) => {
          }, {
             model: City,
          }],
-         order: [['destination', 'ASC']]
+         order: [
+            ['createdAt', 'DESC'],
+            ['destination', 'ASC']
+         ]
       });
-      console.log('destinasi', destination)
       res.json(destination);
    } catch (error) {
       console.log(error);

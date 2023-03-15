@@ -21,7 +21,10 @@ export const getAllDestination = async (req, res) => {
             }, {
                 model: Cities,
             }],
-            order: [['destination','ASC']]
+            order: [
+                ['createdAt', 'DESC'],
+                ['destination', 'ASC']
+            ]
         });
         res.json(dest);
     } catch (error) {
@@ -46,7 +49,8 @@ export const getAllDestinationByUser = async (req, res) => {
                 }
             ],
             order: [
-                ['createdAt', 'DESC']
+                ['createdAt', 'DESC'],
+                ['destination', 'ASC']
             ],
         });
         res.json(dest);
@@ -92,7 +96,8 @@ export const getAllArticleByDestination = async (req, res) => {
                 }
             ],
             order: [
-                ['createdAt', 'DESC']
+                ['createdAt', 'DESC'],
+                ['destination', 'ASC']
             ],
         });
         res.json(article);

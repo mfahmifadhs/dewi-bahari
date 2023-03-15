@@ -4,6 +4,8 @@ import Users from '../models/userModel.js';
 import moment from 'moment';
 import path from 'path';
 import fs from 'fs';
+import Province from '../models/provinceModel.js';
+import City from '../models/cityModel.js';
 
 // Get all article
 export const getAllArticle = async (req, res) => {
@@ -229,5 +231,30 @@ export const deleteArticle = async (req, res) => {
       });
    } catch (error) {
       res.json({ message: error.message });
+   }
+}
+
+// Get all destination
+export const getAllDestByArticle = async (req, res) => {
+   try {
+      const destination = await Destinations.findAll({
+         where: {
+            isApprove: true
+         },
+         include: [{
+            model: Users
+         }, {
+            model: Province,
+         }, {
+            model: City,
+         }],
+         order: [
+            ['createdAt', 'DESC'],
+            ['destination', 'ASC']
+         ]
+      });
+      res.json(destination);
+   } catch (error) {
+      console.log(error);
    }
 }
