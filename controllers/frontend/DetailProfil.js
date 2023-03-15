@@ -107,7 +107,8 @@ export const getDetailLocation = async (req, res) => {
         })
         const article = await Article.findAll({
             where: {
-                destinationId: data.toJSON().id
+                destinationId: data.toJSON().id,
+                isApprove: true
             },
             attributes: ['id', 'title', 'url']
         })

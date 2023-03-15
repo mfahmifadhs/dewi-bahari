@@ -4,7 +4,8 @@ export const getDetailArtikel = async (req, res) => {
     try {
         const data = await Article.findOne({
             where: {
-                id: req.params.id
+                id: req.params.id,
+                isApprove: true
             }
         })
 
@@ -17,12 +18,14 @@ export const getDetailArtikelLainnya = async (req, res) => {
     try {
         const dataArtikel = await Article.findOne({
             where: {
-                id: req.params.id
+                id: req.params.id,
+                isApprove: true
             }
         })
         const data = await Article.findAll({
             where: {
-                destinationId: dataArtikel.toJSON().destinationId
+                destinationId: dataArtikel.toJSON().destinationId,
+                isApprove: true
             },
             attributes: ['id', 'title', 'url']
         })
