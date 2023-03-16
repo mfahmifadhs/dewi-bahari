@@ -21,30 +21,33 @@ export const getPhoto = async (req, res) => {
                 },
             })
             const dataDestinasi = await getDestinationInfo(destinationId)
-            const province = await Province.findOne({
-                where: {
-                    id: dataDestinasi.toJSON().kdProv
-                },
-            })
-            const city = await City.findOne({
-                where: {
-                    id: dataDestinasi.toJSON().kdKab
-                },
-            })
-            const result = image.map((item) => {
-                return {
-                    ...item.toJSON(),
-                    destination: dataDestinasi.toJSON().destination,
-                    province: province.toJSON().province,
-                    city:  city.toJSON().city,
-                }
-            })
-            return result
+            if (dataDestinasi) {
+                const province = await Province.findOne({
+                    where: {
+                        id: dataDestinasi.toJSON().kdProv
+                    },
+                })
+                const city = await City.findOne({
+                    where: {
+                        id: dataDestinasi.toJSON().kdKab
+                    },
+                })
+                const result = image.map((item) => {
+                    return {
+                        ...item.toJSON(),
+                        destination: dataDestinasi.toJSON().destination,
+                        province: province.toJSON().province,
+                        city: city.toJSON().city,
+                    }
+                })
+                return result
+            }
         }
         const getDestinationInfo = async (id) => {
             const data = await Destination.findOne({
                 where: {
-                    id: id
+                    id: id,
+                    isApprove: true
                 },
             })
             return data
@@ -63,9 +66,9 @@ export const getPhoto = async (req, res) => {
                 return data
             })
         )
-
+        const filteredGalleries = galleries.filter((item) => item != null)
         // return res.json(galleryName);
-        return res.json(galleries.flat());
+        return res.json(filteredGalleries.flat());
     } catch (error) {
         return res.json(error.message);
     }
@@ -86,30 +89,33 @@ export const getVideo = async (req, res) => {
                 },
             })
             const dataDestinasi = await getDestinationInfo(destinationId)
-            const province = await Province.findOne({
-                where: {
-                    id: dataDestinasi.toJSON().kdProv
-                },
-            })
-            const city = await City.findOne({
-                where: {
-                    id: dataDestinasi.toJSON().kdKab
-                },
-            })
-            const result = image.map((item) => {
-                return {
-                    ...item.toJSON(),
-                    destination: dataDestinasi.toJSON().destination,
-                    province: province.toJSON().province,
-                    city:  city.toJSON().city,
-                }
-            })
-            return result
+            if (dataDestinasi) {
+                const province = await Province.findOne({
+                    where: {
+                        id: dataDestinasi.toJSON().kdProv
+                    },
+                })
+                const city = await City.findOne({
+                    where: {
+                        id: dataDestinasi.toJSON().kdKab
+                    },
+                })
+                const result = image.map((item) => {
+                    return {
+                        ...item.toJSON(),
+                        destination: dataDestinasi.toJSON().destination,
+                        province: province.toJSON().province,
+                        city: city.toJSON().city,
+                    }
+                })
+                return result
+            }
         }
         const getDestinationInfo = async (id) => {
             const data = await Destination.findOne({
                 where: {
-                    id: id
+                    id: id,
+                    isApprove: true
                 },
             })
             return data
@@ -119,13 +125,14 @@ export const getVideo = async (req, res) => {
         const galleries = await Promise.all(
             galleryName.map(async (gallery) => {
                 const data = await getGalleryImage(gallery.id, gallery.destinationId)
-                
+
                 return data
             })
         )
 
         // return res.json(galleryName);
-        return res.json(galleries.flat());
+        const filteredGalleries = galleries.filter((item) => item != null)
+        return res.json(filteredGalleries.flat());
     } catch (error) {
         return res.json(error.message);
     }
