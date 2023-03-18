@@ -96,8 +96,7 @@ export const getAllArticleByDestination = async (req, res) => {
                 }
             ],
             order: [
-                ['createdAt', 'DESC'],
-                ['destination', 'ASC']
+                ['createdAt', 'DESC']
             ],
         });
         res.json(article);

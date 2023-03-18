@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import Province from '../models/provinceModel.js';
 import City from '../models/cityModel.js';
+import { Sequelize } from "sequelize";
 
 // Get all article
 export const getAllArticle = async (req, res) => {
@@ -254,6 +255,26 @@ export const getAllDestByArticle = async (req, res) => {
          ]
       });
       res.json(destination);
+   } catch (error) {
+      console.log(error);
+   }
+}
+
+// Get total article by destination
+export const getTotalArticleByDestination = async (req, res) => {
+   try {
+      const total = await Articles.findAll({
+         attributes: [
+           [Sequelize.literal('`t_destination`.`destination`'), 'destination'],
+           [Sequelize.fn('count', Sequelize.col('t_articles.id')), 'total']
+         ],
+         include: [{
+           model: Destinations,
+           attributes: []
+         }],
+         group: ['destination'],
+       });
+       res.json(total);  
    } catch (error) {
       console.log(error);
    }
