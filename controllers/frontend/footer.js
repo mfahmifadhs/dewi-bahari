@@ -32,6 +32,8 @@ export const getInformation = async (req, res) => {
                 result['facebook'] = item.description;
             }else if (item.title === "<p>Email</p>") {
                 result['email'] = item.description;
+            }else if (item.title === "<p>Youtube</p>") {
+                result['youtube'] = item.description;
             }
         });
 
