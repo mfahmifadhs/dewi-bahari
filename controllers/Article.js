@@ -37,16 +37,28 @@ export const getAllArticleByUser = async (req, res) => {
             id: req.params.id
          }
       });
+      
       if (user.roleId == 1) {
          const article = await Articles.findAll({
             include: [
                {
                   model: Users,
+                  attributes: []
                },
                {
                   model: Destinations,
-                  required: false
+                  required: false,
+                  attributes: []
                }
+            ],
+            attributes: [
+                // select column yang ingin diambil
+                'id',
+                'title',
+                'content',
+                'isApprove',
+                [Sequelize.literal('`t_destination`.`destination`'), 'destination'],
+                [Sequelize.literal('`t_user`.`name`'), 'user_name']
             ],
             order: [
                ['createdAt', 'DESC']
@@ -67,6 +79,15 @@ export const getAllArticleByUser = async (req, res) => {
                   required: false
                }
             ],
+            attributes: [
+               // select column yang ingin diambil
+               'id',
+               'title',
+               'content',
+               'isApprove',
+               [Sequelize.literal('`t_destination`.`destination`'), 'destination'],
+               [Sequelize.literal('`t_user`.`name`'), 'user_name']
+           ],
             order: [
                ['createdAt', 'DESC']
             ],
@@ -168,6 +189,7 @@ export const updateArticle = async (req, res) => {
 
    const { userId, destinationId, title, content, isApprove } = req.body;
    const url = `${req.protocol}://${req.get("host")}/images/article/${fileName}`;
+   const approval = isApprove === 'false' ? null : article.isApprove 
 
    try {
       await Articles.update({
@@ -177,7 +199,7 @@ export const updateArticle = async (req, res) => {
          content,
          filePict: fileName,
          url: url,
-         isApprove
+         isApprove: approval
       }, {
          where: {
             id: req.params.id
@@ -270,7 +292,8 @@ export const getTotalArticleByDestination = async (req, res) => {
          ],
          include: [{
            model: Destinations,
-           attributes: []
+           attributes: [],
+           required: false
          }],
          group: ['destination'],
        });

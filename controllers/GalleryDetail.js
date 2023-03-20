@@ -42,6 +42,7 @@ export const getDetailGalleryById = async (req, res) => {
                include: [
                   {
                      model: Destination,
+                     required: false,
                      include: [
                         {
                            model: Users

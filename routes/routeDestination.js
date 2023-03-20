@@ -3,10 +3,14 @@ import {
    approveDestination, 
    createDestination, 
    deleteDestination, 
+   deleteFacilityById, 
+   deleteOfficerById, 
+   deleteSocialMediaById, 
    getAllArticleByDestination, 
    getAllCity, 
    getAllDestination, 
    getAllDestinationByUser, 
+   getAllDestinationUserById, 
    getAllProvince, 
    getDestinationById, 
    getFacilityById, 
@@ -26,6 +30,7 @@ const routeDestination = express.Router();
 
 routeDestination.get('/dt', getAllDestination);
 routeDestination.get('/dt/us/:id', getAllDestinationByUser);
+routeDestination.get('/dt/us/f/:id', getAllDestinationUserById);
 routeDestination.get('/dt/:id', getDestinationById);
 routeDestination.post('/dt', createDestination);
 routeDestination.patch('/dt/:id', updateDestination);
@@ -39,10 +44,13 @@ routeDestination.get('/ct/pv/:id', getAllCity);
 routeDestination.get('/ar/dt/:id', getAllArticleByDestination);
 // Get social media by dest
 routeDestination.get('/sc/dt/:id', getSocialMediaById);
+routeDestination.delete('/sc/dt/:id', deleteSocialMediaById);
 // Get officer by dest
 routeDestination.get('/oc/dt/:id', getOfficerById);
+routeDestination.delete('/oc/dt/:id', deleteOfficerById);
 // Get facility by dest
 routeDestination.get('/fc/dt/:id', getFacilityById);
+routeDestination.delete('/fc/dt/:id', deleteFacilityById);
 // Get facility by dest
 routeDestination.get('/rc', getAllRecomendation);
 routeDestination.get('/rc/:id', getRecomendationById);

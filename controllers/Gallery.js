@@ -32,7 +32,8 @@ export const getGalleryById = async (req, res) => {
             id: req.params.id
          },
          include: [{
-            model: Destinations
+            model: Destinations,
+            required: false
          }],
          order: [
             ['createdAt', 'DESC']
@@ -44,9 +45,57 @@ export const getGalleryById = async (req, res) => {
    }
 }
 
+export const getAllGalleryByUser = async (req, res) => {
+   try {
+      const user = await Users.findOne({
+         where: {
+            id: req.params.id
+         }
+      });
+      if (user.roleId == 1) {
+         const data = await Gallery.findAll({
+            include: [
+               {
+                  model: Users,
+               },
+               {
+                  model: Destinations,
+                  required: false
+               }
+            ],
+            order: [
+               ['createdAt', 'DESC']
+            ],
+         });
+         res.json(data);
+      } else {
+         const data = await Gallery.findAll({
+            where: {
+               userId: req.params.id
+            },
+            include: [
+               {
+                  model: Users,
+               },
+               {
+                  model: Destinations,
+                  required: false
+               }
+            ],
+            order: [
+               ['createdAt', 'DESC']
+            ],
+         });
+         res.json(data);
+      }
+   } catch (error) {
+      console.log(error);
+   }
+}
+
 // Create Gallery
 export const createGallery = async (req, res) => {
-   const { id, destinationId, nameGallery } = req.body;
+   const { id, destinationId, nameGallery, userId } = req.body;
 
    if (nameGallery == 'atraction') {
       const file = req.files['selectedFiles[]']
@@ -111,8 +160,8 @@ export const createGallery = async (req, res) => {
          })
       }
 
-   } 
-   
+   }
+
    if (nameGallery == 'gallery') {
       const file = req.files['selectedFiles[]']
       if (file.length >= 2) {
@@ -179,7 +228,8 @@ export const createGallery = async (req, res) => {
       await Gallery.create({
          id,
          destinationId,
-         nameGallery
+         nameGallery,
+         userId
       });
       res.status(201).json({ msg: "Berhasil Menambah Galeri" });
    } catch (error) {

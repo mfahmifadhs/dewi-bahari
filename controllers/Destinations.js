@@ -9,22 +9,36 @@ import Officer from '../models/officerModel.js';
 import Facility from '../models/facilityModel.js';
 import path from 'path';
 import fs from 'fs';
+import { Sequelize } from "sequelize";
 
 // Get all destination
 export const getAllDestination = async (req, res) => {
     try {
+
         const dest = await Destination.findAll({
             include: [{
-                model: Users
+                model: Users,
+                attributes: []
             }, {
                 model: Province,
+                attributes: []
             }, {
                 model: Cities,
+                attributes: []
             }],
+            attributes: [
+                // select column yang ingin diambil
+                'id',
+                'destination',
+                'category',
+                'address',
+                [Sequelize.literal('`t_province`.`province`'), 'province_name'],
+                [Sequelize.literal('`t_city`.`city`'), 'city_name'],
+                [Sequelize.literal('`t_user`.`name`'), 'user_name']
+            ],
             order: [
-                ['createdAt', 'DESC'],
-                ['destination', 'ASC']
-            ]
+                ['createdAt', 'DESC']
+            ],
         });
         res.json(dest);
     } catch (error) {
@@ -55,7 +69,33 @@ export const getAllDestinationByUser = async (req, res) => {
         });
         res.json(dest);
     } catch (error) {
-        console.log(error);
+        // console.log(error);
+    }
+}
+
+export const getAllDestinationUserById = async (req, res) => {
+    try {
+        const dest = await Destination.findOne({
+            where: {
+                userId: req.params.id
+            },
+            include: [
+                {
+                    model: Users
+                }, {
+                    model: Province,
+                }, {
+                    model: Cities,
+                }
+            ],
+            order: [
+                ['createdAt', 'DESC'],
+                ['destination', 'ASC']
+            ],
+        });
+        res.json(dest);
+    } catch (error) {
+        // console.log(error);
     }
 }
 
@@ -107,7 +147,7 @@ export const getAllArticleByDestination = async (req, res) => {
 
 // Create destination
 // export const createDestination = async (req, res) => {
-//     console.log(req.body)
+//     // console.log(req.body)
 // }
 export const createDestination = async (req, res) => {
     if (req.files === null) return res.status(400).json({ msg: "Tidak ada file yang di Upload." })
@@ -141,7 +181,7 @@ export const createDestination = async (req, res) => {
             });
             res.status(201).json({ msg: "Berhasil Menambah Destinasi Wisata" });
         } catch (error) {
-            console.log(error.message);
+            // console.log(error.message);
         }
     })
 
@@ -163,14 +203,14 @@ export const createDestination = async (req, res) => {
     const filteredFacilitiesArr = facilityArr.filter((elem) => elem !== undefined);
     for (let i = 0; i < filteredFacilitiesArr.length; i++) {
         const facility = filteredFacilitiesArr[i];
-        console.log('dataFacility', facility);
+        // console.log('dataFacility', facility);
         try {
             await Facility.create({
                 destinationId: id,
                 nameFacility: facility
             });
         } catch (error) {
-            console.log(error.message);
+            // console.log(error.message);
         }
     }
 
@@ -192,14 +232,14 @@ export const createDestination = async (req, res) => {
     const filteredOfficersArr = officersArr.filter((elem) => elem !== undefined);
     for (let i = 0; i < filteredOfficersArr.length; i++) {
         const officer = filteredOfficersArr[i];
-        console.log('data officer', officer);
+        // console.log('data officer', officer);
         try {
             await Officer.create({
                 destinationId: id,
                 nameOfficer: officer
             });
         } catch (error) {
-            console.log(error.message);
+            // console.log(error.message);
         }
     }
 
@@ -230,7 +270,7 @@ export const createDestination = async (req, res) => {
                 link: socialMediaArr[i].link
             });
         } catch (error) {
-            console.log(error.message);
+            // console.log(error.message);
         }
     }
 }
@@ -289,108 +329,120 @@ export const updateDestination = async (req, res) => {
     } catch (error) {
         res.json({ message: error.message });
     }
-        
+
     // Update Facility
     const facilityArr = [];
-    const facilityRegexPattern = /\[(\d+)\]\[socialMedia\]/;
-    Object.keys(req.body).forEach((key) => {
-        const match = key.match(facilityRegexPattern);
-        if (match !== null) {
-            const index = match[1];
-            const idFacility = req.body[`facility[${index}][id]`] || null;
-            const destinationId = req.body[`facility[${index}][destinationId]`] || null;
-            const facility = req.body[`facility[${index}][nameFacility]`] || null;
-            if (idFacility !== null && destinationId !== null && facility !== null) {
-                facilityArr[index] = { idFacility, destinationId, facility };
-            }
-        }
-    });
+    Object.keys(req.body)
+        .filter(key => key.includes('facility'))
+        .forEach((key) => {
+            const match = key.match(/\[(\d+)\]\[(\w+)\]/);
+            if (match !== null) {
+                const index = match[1];
+                const property = match[2];
+                const value = req.body[key] || null;
 
-    // Filter out undefined elements from the array
-    const filteredFacilitiesArr = facilityArr.filter((elem) => elem !== undefined);
-    console.log('dataFacility', filteredFacilitiesArr)
-    for (let i = 0; i < filteredFacilitiesArr.length; i++) {
-        const { idFacility, destinationId, facility } = facilityArr[i];
-        try {
+                if (facilityArr[index] === undefined) {
+                    facilityArr[index] = { destinationId: null };
+                }
+                facilityArr[index][property] = value;
+            }
+        });
+
+    const filteredFacilityArr = facilityArr.filter((elem) => elem !== undefined);
+    for (let i = 0; i < filteredFacilityArr.length; i++) {
+        const { id, nameFacility } = facilityArr[i];
+        if (id) {
             await Facility.update({
-                destinationId,
-                nameFacility: facility
-             }, {
+                destinationId: req.params.id,
+                nameFacility
+            }, {
                 where: {
-                   id: idFacility
+                    id
                 }
-             });
-        } catch (error) {
-            console.log(error.message);
-        }
-    }
-
-    // Update Officer
-    const officersArr = [];
-    const officerRegexPattern = /\[(\d+)\]\[socialMedia\]/;
-    console.log('data', req.body)
-    Object.keys(req.body).forEach((key) => {
-        const match = key.match(officerRegexPattern);
-        if (match !== null) {
-            const index = match[1];
-            const idOfficer = req.body[`officer[${index}][id]`] || null;
-            const destinationId = req.body[`officer[${index}][destinationId]`] || null;
-            const officer = req.body[`officer[${index}][nameOfficer]`] || null;
-            if (idOfficer !== null && destinationId !== null && officer !== null) {
-                officersArr[index] = { idOfficer, destinationId, officer };
-            }
-        }
-    });
-    
-    const filteredOfficersArr = officersArr.filter((elem) => elem !== undefined);
-    for (let i = 0; i < filteredOfficersArr.length; i++) {
-        const { idOfficer, destinationId, officer } = officersArr[i];
-        try {
-            await Officer.update({
-                destinationId,
-                nameOfficer: officer
-             }, {
-                where: {
-                   id: idOfficer
-                }
-             });
-        } catch (error) {
-            console.log(error.message);
+            });
+        } else {
+            await Facility.create({
+                destinationId: req.params.id,
+                nameFacility
+            })
         }
     }
 
     // Update Social Media
     const socialMediaArr = [];
-    const regexPattern = /\[(\d+)\]\[socialMedia\]/;
-    Object.keys(req.body).forEach((key) => {
-        const match = key.match(regexPattern);
-        if (match !== null) {
-            const index = match[1];
-            const idSocialMedia = req.body[`socialMedia[${index}][id]`] || null;
-            const destinationId = req.body[`socialMedia[${index}][destinationId]`] || null;
-            const socialMedia = req.body[`socialMedia[${index}][socialMedia]`] || null;
-            const link = req.body[`socialMedia[${index}][link]`] || null;
-            if (socialMedia !== null && link !== null) {
-                socialMediaArr[index] = { idSocialMedia, destinationId, socialMedia, link };
-            }
-        }
-    });
+    Object.keys(req.body)
+        .filter(key => key.includes('socialMedia'))
+        .forEach((key) => {
+            const match = key.match(/\[(\d+)\]\[(\w+)\]/);
+            if (match !== null) {
+                const index = match[1];
+                const property = match[2];
+                const value = req.body[key] || null;
 
-    const filteredArr = socialMediaArr.filter((elem) => elem !== undefined);
-    for (let i = 0; i < filteredArr.length; i++) {
-        const { idSocialMedia, destinationId, socialMedia, link } = socialMediaArr[i];
-        try {
+                if (socialMediaArr[index] === undefined) {
+                    socialMediaArr[index] = { destinationId: null };
+                }
+                socialMediaArr[index][property] = value;
+            }
+        });
+
+    const filteredSocialMediaArr = socialMediaArr.filter((elem) => elem !== undefined);
+    for (let i = 0; i < filteredSocialMediaArr.length; i++) {
+        const { id, socialMedia, link } = socialMediaArr[i];
+        if (id) {
             await SocialMedia.update({
-                destinationId,
+                destinationId: req.params.id,
                 socialMedia,
                 link
-             }, {
+            }, {
                 where: {
-                   id: idSocialMedia
+                    id
                 }
-             });
-        } catch (error) {
-            console.log(error.message);
+            });
+        } else {
+            await SocialMedia.create({
+                destinationId: req.params.id,
+                socialMedia,
+                link
+            })
+        }
+    }
+
+    // Update Officer
+    const officersArr = [];
+    Object.keys(req.body)
+        .filter(key => key.includes('officer'))
+        .forEach((key) => {
+            const match = key.match(/\[(\d+)\]\[(\w+)\]/);
+            if (match !== null) {
+                const index = match[1];
+                const property = match[2];
+                const value = req.body[key] || null;
+
+                if (officersArr[index] === undefined) {
+                    officersArr[index] = { destinationId: null };
+                }
+                officersArr[index][property] = value;
+            }
+        });
+
+    const filteredOfficersArr = officersArr.filter((elem) => elem !== undefined);
+    for (let i = 0; i < filteredOfficersArr.length; i++) {
+        const { id, nameOfficer } = officersArr[i];
+        if (id) {
+            await Officer.update({
+                destinationId: req.params.id,
+                nameOfficer
+            }, {
+                where: {
+                    id
+                }
+            });
+        } else {
+            await Officer.create({
+                destinationId: req.params.id,
+                nameOfficer
+            })
         }
     }
 }
@@ -412,6 +464,57 @@ export const deleteDestination = async (req, res) => {
     }
 }
 
+// Delete Facility
+export const deleteFacilityById = async (req, res) => {
+    try {
+        const data = await Facility.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        await data.softDelete();
+        res.json({
+            "message": "Data Fasilitas Berhasil Dihapus"
+        });
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
+
+// Delete Social Media
+export const deleteSocialMediaById = async (req, res) => {
+    try {
+        const data = await SocialMedia.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        await data.softDelete();
+        res.json({
+            "message": "Data Sosial Media Berhasil Dihapus"
+        });
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
+
+// Delete Officer
+export const deleteOfficerById = async (req, res) => {
+    try {
+        const data = await Officer.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        await data.softDelete();
+        res.json({
+            "message": "Data Pengelola Berhasil Dihapus"
+        });
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
+
 // Get all province
 export const getAllProvince = async (req, res) => {
     try {
@@ -422,7 +525,7 @@ export const getAllProvince = async (req, res) => {
         });
         res.json(prov);
     } catch (error) {
-        console.log(error);
+        // console.log(error);
     }
 }
 export const getAllCity = async (req, res) => {
@@ -440,7 +543,7 @@ export const getAllCity = async (req, res) => {
         });
         res.json(city);
     } catch (error) {
-        console.log(error);
+        // console.log(error);
     }
 }
 
@@ -451,7 +554,7 @@ export const approveDestination = async (req, res) => {
             id: req.params.id
         }
     });
-    console.log(destination)
+    // console.log(destination)
     if (!destination) return res.status(404).json({ msg: "No Data Found" });
 
     const { isApprove, note } = req.body;
