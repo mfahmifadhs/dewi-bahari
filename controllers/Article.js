@@ -4,6 +4,9 @@ import Users from '../models/userModel.js';
 import moment from 'moment';
 import path from 'path';
 import fs from 'fs';
+import Province from '../models/provinceModel.js';
+import City from '../models/cityModel.js';
+import { Sequelize } from "sequelize";
 
 // Get all article
 export const getAllArticle = async (req, res) => {
@@ -34,16 +37,28 @@ export const getAllArticleByUser = async (req, res) => {
             id: req.params.id
          }
       });
+      
       if (user.roleId == 1) {
          const article = await Articles.findAll({
             include: [
                {
                   model: Users,
+                  attributes: []
                },
                {
                   model: Destinations,
-                  required: false
+                  required: false,
+                  attributes: []
                }
+            ],
+            attributes: [
+                // select column yang ingin diambil
+                'id',
+                'title',
+                'content',
+                'isApprove',
+                [Sequelize.literal('`t_destination`.`destination`'), 'destination'],
+                [Sequelize.literal('`t_user`.`name`'), 'user_name']
             ],
             order: [
                ['createdAt', 'DESC']
@@ -64,6 +79,15 @@ export const getAllArticleByUser = async (req, res) => {
                   required: false
                }
             ],
+            attributes: [
+               // select column yang ingin diambil
+               'id',
+               'title',
+               'content',
+               'isApprove',
+               [Sequelize.literal('`t_destination`.`destination`'), 'destination'],
+               [Sequelize.literal('`t_user`.`name`'), 'user_name']
+           ],
             order: [
                ['createdAt', 'DESC']
             ],
@@ -165,6 +189,7 @@ export const updateArticle = async (req, res) => {
 
    const { userId, destinationId, title, content, isApprove } = req.body;
    const url = `${req.protocol}://${req.get("host")}/images/article/${fileName}`;
+   const approval = isApprove === 'false' ? null : article.isApprove 
 
    try {
       await Articles.update({
@@ -174,7 +199,7 @@ export const updateArticle = async (req, res) => {
          content,
          filePict: fileName,
          url: url,
-         isApprove
+         isApprove: approval
       }, {
          where: {
             id: req.params.id
@@ -229,5 +254,51 @@ export const deleteArticle = async (req, res) => {
       });
    } catch (error) {
       res.json({ message: error.message });
+   }
+}
+
+// Get all destination
+export const getAllDestByArticle = async (req, res) => {
+   try {
+      const destination = await Destinations.findAll({
+         where: {
+            isApprove: true
+         },
+         include: [{
+            model: Users
+         }, {
+            model: Province,
+         }, {
+            model: City,
+         }],
+         order: [
+            ['createdAt', 'DESC'],
+            ['destination', 'ASC']
+         ]
+      });
+      res.json(destination);
+   } catch (error) {
+      console.log(error);
+   }
+}
+
+// Get total article by destination
+export const getTotalArticleByDestination = async (req, res) => {
+   try {
+      const total = await Articles.findAll({
+         attributes: [
+           [Sequelize.literal('`t_destination`.`destination`'), 'destination'],
+           [Sequelize.fn('count', Sequelize.col('t_articles.id')), 'total']
+         ],
+         include: [{
+           model: Destinations,
+           attributes: [],
+           required: false
+         }],
+         group: ['destination'],
+       });
+       res.json(total);  
+   } catch (error) {
+      console.log(error);
    }
 }
