@@ -10,11 +10,11 @@ import Facility from '../models/facilityModel.js';
 import path from 'path';
 import fs from 'fs';
 import { Sequelize } from "sequelize";
+import Contact from '../models/contact.js';
 
 // Get all destination
 export const getAllDestination = async (req, res) => {
     try {
-
         const dest = await Destination.findAll({
             include: [{
                 model: Users,
@@ -42,7 +42,7 @@ export const getAllDestination = async (req, res) => {
         });
         res.json(dest);
     } catch (error) {
-        console.log(error);
+        res.json({ message: error.message });
     }
 }
 
@@ -69,7 +69,7 @@ export const getAllDestinationByUser = async (req, res) => {
         });
         res.json(dest);
     } catch (error) {
-        // console.log(error);
+        res.json({ message: error.message });
     }
 }
 
@@ -95,7 +95,7 @@ export const getAllDestinationUserById = async (req, res) => {
         });
         res.json(dest);
     } catch (error) {
-        // console.log(error);
+        res.json({ message: error.message });
     }
 }
 
@@ -181,7 +181,7 @@ export const createDestination = async (req, res) => {
             });
             res.status(201).json({ msg: "Berhasil Menambah Destinasi Wisata" });
         } catch (error) {
-            // console.log(error.message);
+            res.json({ message: error.message });
         }
     })
 
@@ -210,7 +210,37 @@ export const createDestination = async (req, res) => {
                 nameFacility: facility
             });
         } catch (error) {
-            // console.log(error.message);
+            res.json({ message: error.message });
+        }   
+    }
+    console.log('data', req.body)
+    // Insert Contact
+    const contactArr = [];
+    const contactRegexPattern = /contact\[(\d+)\]\[value\]/; // change the pattern
+    Object.keys(req.body).forEach((key) => {
+        const match = key.match(contactRegexPattern);
+        if (match !== null) {
+            const index = match[1];
+            const contact = req.body[`contact[${index}][value]`] || null;
+            const phoneNumber = req.body[`contactPhoneNum[${index}][value]`] || null;
+            if (contact !== null && phoneNumber !== null) {
+                contactArr[index] = { contact, phoneNumber };
+            }
+        }
+    });
+
+    // Filter contact
+    const filteredContactArr = contactArr.filter((elem) => elem !== undefined);
+    for (let i = 0; i < filteredContactArr.length; i++) {
+        const { contact, phoneNumber } = contactArr[i];
+        try {
+            await Contact.create({
+                destinationId: id,
+                contactName: contact,
+                phoneNumber: phoneNumber
+            });
+        } catch (error) {
+            res.json({ message: error.message });
         }
     }
 
@@ -239,7 +269,7 @@ export const createDestination = async (req, res) => {
                 nameOfficer: officer
             });
         } catch (error) {
-            // console.log(error.message);
+            res.json({ message: error.message });
         }
     }
 
@@ -270,7 +300,7 @@ export const createDestination = async (req, res) => {
                 link: socialMediaArr[i].link
             });
         } catch (error) {
-            // console.log(error.message);
+            res.json({ message: error.message });
         }
     }
 }
@@ -364,6 +394,46 @@ export const updateDestination = async (req, res) => {
             await Facility.create({
                 destinationId: req.params.id,
                 nameFacility
+            })
+        }
+    }
+
+    // Update Contact
+    const contactArr = [];
+    Object.keys(req.body)
+        .filter(key => key.includes('contact'))
+        .forEach((key) => {
+            const match = key.match(/\[(\d+)\]\[(\w+)\]/);
+            if (match !== null) {
+                const index = match[1];
+                const property = match[2];
+                const value = req.body[key] || null;
+
+                if (contactArr[index] === undefined) {
+                    contactArr[index] = { destinationId: null };
+                }
+                contactArr[index][property] = value;
+            }
+        });
+
+    const filteredContactArr = contactArr.filter((elem) => elem !== undefined);
+    for (let i = 0; i < filteredContactArr.length; i++) {
+        const { id, contactName, phoneNumber } = contactArr[i];
+        if (id) {
+            await Contact.update({
+                destinationId: req.params.id,
+                contactName,
+                phoneNumber
+            }, {
+                where: {
+                    id
+                }
+            });
+        } else {
+            await Contact.create({
+                destinationId: req.params.id,
+                contactName,
+                phoneNumber
             })
         }
     }
@@ -481,6 +551,23 @@ export const deleteFacilityById = async (req, res) => {
     }
 }
 
+// Delete Contact
+export const deleteContactById = async (req, res) => {
+    try {
+        const data = await Contact.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        await data.softDelete();
+        res.json({
+            "message": "Data Kontak Berhasil Dihapus"
+        });
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
+
 // Delete Social Media
 export const deleteSocialMediaById = async (req, res) => {
     try {
@@ -525,7 +612,7 @@ export const getAllProvince = async (req, res) => {
         });
         res.json(prov);
     } catch (error) {
-        // console.log(error);
+        res.json({ message: error.message });
     }
 }
 export const getAllCity = async (req, res) => {
@@ -543,7 +630,7 @@ export const getAllCity = async (req, res) => {
         });
         res.json(city);
     } catch (error) {
-        // console.log(error);
+        res.json({ message: error.message });
     }
 }
 
@@ -607,6 +694,20 @@ export const getOfficerById = async (req, res) => {
 export const getFacilityById = async (req, res) => {
     try {
         const dest = await Facility.findAll({
+            where: {
+                destinationId: req.params.id
+            }
+        });
+        res.json(dest);
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
+
+// Get officer media by id
+export const getContactById = async (req, res) => {
+    try {
+        const dest = await Contact.findAll({
             where: {
                 destinationId: req.params.id
             }

@@ -31,7 +31,7 @@ export const getPartnerById = async (req, res) => {
 export const createPartner = async (req, res) => {
    if (req.files === null) return res.status(400).json({ msg: "Tidak ada file yang di Upload." })
 
-   const { category, partner } = req.body;
+   const { category, partner, hyperlink } = req.body;
    const file = req.files.filePict;
    const fileSize = file.data.length;
    const ext = path.extname(file.name);
@@ -50,6 +50,7 @@ export const createPartner = async (req, res) => {
             partner,
             filePict: fileName,
             url,
+            hyperlink,
          });
          res.status(201).json({ msg: "Berhasil Menambah Mitra Baru" });
       } catch (error) {
@@ -88,7 +89,7 @@ export const updatePartner = async (req, res) => {
       });
    }
 
-   const { category, partner } = req.body;
+   const { category, partner, hyperlink } = req.body;
    const url = `${req.protocol}://${req.get("host")}/images/partner/${fileName}`;
 
    try {
@@ -96,7 +97,8 @@ export const updatePartner = async (req, res) => {
          category,
          partner,
          filePict: fileName,
-         url
+         url,
+         hyperlink,
       }, {
          where: {
             id: req.params.id

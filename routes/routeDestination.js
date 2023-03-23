@@ -2,6 +2,7 @@ import express from "express";
 import { 
    approveDestination, 
    createDestination, 
+   deleteContactById, 
    deleteDestination, 
    deleteFacilityById, 
    deleteOfficerById, 
@@ -12,6 +13,7 @@ import {
    getAllDestinationByUser, 
    getAllDestinationUserById, 
    getAllProvince, 
+   getContactById, 
    getDestinationById, 
    getFacilityById, 
    getOfficerById, 
@@ -51,6 +53,9 @@ routeDestination.delete('/oc/dt/:id', deleteOfficerById);
 // Get facility by dest
 routeDestination.get('/fc/dt/:id', getFacilityById);
 routeDestination.delete('/fc/dt/:id', deleteFacilityById);
+// Get contact by dest
+routeDestination.get('/ct/dt/:id', getContactById);
+routeDestination.delete('/ct/dt/:id', deleteContactById);
 // Get facility by dest
 routeDestination.get('/rc', getAllRecomendation);
 routeDestination.get('/rc/:id', getRecomendationById);
