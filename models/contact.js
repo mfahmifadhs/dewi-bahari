@@ -3,20 +3,14 @@ import db from "../config/database.js";
 
 const { DataTypes } = Sequelize;
 
-const Partner = db.define('t_partners', {
-   category: {
+const Contact = db.define('t_contacts', {
+   destinationId: {
+      type: DataTypes.INTEGER
+   },
+   contactName: {
       type: DataTypes.STRING
    },
-   partner: {
-      type: DataTypes.STRING
-   },
-   filePict: {
-      type: DataTypes.STRING
-   },
-   url: {
-      type: DataTypes.STRING
-   },
-   hyperlink: {
+   phoneNumber: {
       type: DataTypes.STRING
    },
    deletedAt: {
@@ -30,13 +24,13 @@ const Partner = db.define('t_partners', {
    }
 });
 
-Partner.prototype.softDelete = function () {
+Contact.prototype.softDelete = function () {
    this.setDataValue('deletedAt', new Date());
    return this.save();
 };
 
-Partner.findAllDeleted = function () {
+Contact.findAllDeleted = function () {
    return this.unscoped().findAll({ where: { deletedAt: { [Sequelize.Op.ne]: null } } });
 };
 
-export default Partner;
+export default Contact;
