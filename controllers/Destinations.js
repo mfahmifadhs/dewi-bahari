@@ -337,7 +337,6 @@ export const updateDestination = async (req, res) => {
 
     const { kdProv, kdKab, category, destination, address, description, embMap, userId, isApprove } = req.body;
     const url = `${req.protocol}://${req.get("host")}/images/destination/${fileName}`;
-   const approval = isApprove === 'false' ? null : dest.isApprove 
     try {
         await Destination.update({
             kdProv,
@@ -350,7 +349,7 @@ export const updateDestination = async (req, res) => {
             userId,
             filePict: fileName,
             url: url,
-            isApprove: approval
+            isApprove
         }, {
             where: {
                 id: req.params.id
