@@ -7,7 +7,7 @@ import Gallery from "../../models/galleryModel.js";
 import Officer from "../../models/officerModel.js";
 import Province from "../../models/provinceModel.js";
 import SocialMedia from "../../models/socialMedia.js";
-import Users from "../../models/userModel.js";
+import Contact from "../../models/contact.js";
 
 export const getDetailLocation = async (req, res) => {
     try {
@@ -19,10 +19,10 @@ export const getDetailLocation = async (req, res) => {
             attributes: ['id','userId', 'kdProv','kdKab', 'destination', 'address', 'url', 'description', 'embMap']
         })
 
-        const admin = await Users.findOne({
-            attributes: ['id','name','phoneNum'],
+        const contact = await Contact.findAll({
+            attributes: ['id','contactName','phoneNumber'],
             where: {
-                id: data.toJSON().userId
+                destinationId: data.toJSON().id
             },
         })
         const sosmed = await SocialMedia.findAll({
@@ -118,7 +118,7 @@ export const getDetailLocation = async (req, res) => {
             ...data.toJSON(),
             province: province.toJSON().province,
             city: city.toJSON().city,
-            admin: admin,
+            contact: contact,
             sosmed: sosmed,
             facility: facility,
             atraction: atraction,
