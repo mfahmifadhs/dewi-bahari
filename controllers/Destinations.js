@@ -32,6 +32,7 @@ export const getAllDestination = async (req, res) => {
                 'destination',
                 'category',
                 'address',
+                'isApprove',
                 [Sequelize.literal('`t_province`.`province`'), 'province_name'],
                 [Sequelize.literal('`t_city`.`city`'), 'city_name'],
                 [Sequelize.literal('`t_user`.`name`'), 'user_name']
@@ -334,8 +335,9 @@ export const updateDestination = async (req, res) => {
         });
     }
 
-    const { kdProv, kdKab, category, destination, address, description, embMap, userId } = req.body;
+    const { kdProv, kdKab, category, destination, address, description, embMap, userId, isApprove } = req.body;
     const url = `${req.protocol}://${req.get("host")}/images/destination/${fileName}`;
+   const approval = isApprove === 'false' ? null : dest.isApprove 
     try {
         await Destination.update({
             kdProv,
@@ -347,7 +349,8 @@ export const updateDestination = async (req, res) => {
             embMap,
             userId,
             filePict: fileName,
-            url: url
+            url: url,
+            isApprove: approval
         }, {
             where: {
                 id: req.params.id
