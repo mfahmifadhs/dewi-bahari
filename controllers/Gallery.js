@@ -95,6 +95,7 @@ export const getAllGalleryByUser = async (req, res) => {
 
 // Create Gallery
 export const createGallery = async (req, res) => {
+   const API_URL = process.env.REACT_APP_API_URL_LOCAL;
    const { id, destinationId, nameGallery, userId } = req.body;
 
    if (nameGallery == 'atraction') {
@@ -104,7 +105,7 @@ export const createGallery = async (req, res) => {
             const fileSize = value.data.length;
             const ext = path.extname(value.name);
             const fileName = value.md5 + ext;
-            const url = `${req.protocol}://${req.get("host")}/images/gallery/atraction/${fileName}`;
+            const url = `${API_URL}images/gallery/atraction/${fileName}`;
             const allowedType = ['.png', '.jpg', '.jpeg', '.mp4'];
 
             if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
@@ -133,7 +134,7 @@ export const createGallery = async (req, res) => {
          const fileSize = file.data.length;
          const ext = path.extname(file.name);
          const fileName = file.md5 + ext;
-         const url = `${req.protocol}://${req.get("host")}/images/gallery/atraction/${fileName}`;
+         const url = `${API_URL}images/gallery/atraction/${fileName}`;
          const allowedType = ['.png', '.jpg', '.jpeg', '.mp4'];
 
          if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
@@ -169,7 +170,7 @@ export const createGallery = async (req, res) => {
             const fileSize = value.data.length;
             const ext = path.extname(value.name);
             const fileName = value.md5 + ext;
-            const url = `${req.protocol}://${req.get("host")}/images/gallery/${fileName}`;
+            const url = `${API_URL}images/gallery/${fileName}`;
             const allowedType = ['.png', '.jpg', '.jpeg', '.mp4'];
 
             if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
@@ -197,7 +198,7 @@ export const createGallery = async (req, res) => {
          const fileSize = file.data.length;
          const ext = path.extname(file.name);
          const fileName = file.md5 + ext;
-         const url = `${req.protocol}://${req.get("host")}/images/gallery/${fileName}`;
+         const url = `${API_URL}images/gallery/${fileName}`;
          const allowedType = ['.png', '.jpg', '.jpeg', '.mp4'];
 
          if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
@@ -240,6 +241,7 @@ export const createGallery = async (req, res) => {
 
 // Update Gallery
 export const updateGallery = async (req, res) => {
+   const API_URL = process.env.REACT_APP_API_URL_LOCAL;
    const gallery = await Gallery.findOne({
       where: {
          id: req.params.id

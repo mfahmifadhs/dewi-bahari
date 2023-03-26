@@ -29,6 +29,7 @@ export const getPartnerById = async (req, res) => {
 
 // Create partner
 export const createPartner = async (req, res) => {
+   const API_URL = process.env.REACT_APP_API_URL_LOCAL;
    if (req.files === null) return res.status(400).json({ msg: "Tidak ada file yang di Upload." })
 
    const { category, partner, hyperlink } = req.body;
@@ -36,7 +37,7 @@ export const createPartner = async (req, res) => {
    const fileSize = file.data.length;
    const ext = path.extname(file.name);
    const fileName = file.md5 + ext;
-   const url = `${req.protocol}://${req.get("host")}/images/partner/${fileName}`;
+   const url = `${API_URL}images/partner/${fileName}`;
    const allowedType = ['.png', '.jpg', '.jpeg'];
 
    if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
@@ -61,6 +62,7 @@ export const createPartner = async (req, res) => {
 
 // Update partner
 export const updatePartner = async (req, res) => {
+   const API_URL = process.env.REACT_APP_API_URL_LOCAL;
    const partners = await Partner.findOne({
       where: {
          id: req.params.id
@@ -90,7 +92,7 @@ export const updatePartner = async (req, res) => {
    }
 
    const { category, partner, hyperlink } = req.body;
-   const url = `${req.protocol}://${req.get("host")}/images/partner/${fileName}`;
+   const url = `${API_URL}images/partner/${fileName}`;
 
    try {
       await Partner.update({

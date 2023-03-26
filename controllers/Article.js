@@ -125,6 +125,7 @@ export const getArticleById = async (req, res) => {
 
 // Create article
 export const createArticle = async (req, res) => {
+   const API_URL = process.env.REACT_APP_API_URL_LOCAL;
    if (req.files === null) return res.status(400).json({ msg: "Tidak ada file yang di Upload." })
 
    const { userId, destinationId, title, content, filePict, isApprove } = req.body;
@@ -132,7 +133,7 @@ export const createArticle = async (req, res) => {
    const fileSize = file.data.length;
    const ext = path.extname(file.name);
    const fileName = file.md5 + ext;
-   const url = `${req.protocol}://${req.get("host")}/images/article/${fileName}`;
+   const url = `${API_URL}images/article/${fileName}`;
    const allowedType = ['.png', '.jpg', '.jpeg'];
 
    if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
@@ -159,6 +160,7 @@ export const createArticle = async (req, res) => {
 
 // Update article
 export const updateArticle = async (req, res) => {
+   const API_URL = process.env.REACT_APP_API_URL_LOCAL;
    const article = await Articles.findOne({
       where: {
          id: req.params.id
@@ -188,7 +190,7 @@ export const updateArticle = async (req, res) => {
    }
 
    const { userId, destinationId, title, content, isApprove } = req.body;
-   const url = `${req.protocol}://${req.get("host")}/images/article/${fileName}`;
+   const url = `${API_URL}images/article/${fileName}`;
    const approval = isApprove === 'false' ? null : article.isApprove 
 
    try {

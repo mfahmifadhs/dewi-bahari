@@ -64,6 +64,7 @@ export const getDetailGalleryById = async (req, res) => {
 
 export const updateDetailGallery = async (req, res) => {
    try {
+      const API_URL = process.env.REACT_APP_API_URL_LOCAL;
       const { destinationId, nameGallery, title } = req.body;
       // Update Gallery
       await Gallery.update({
@@ -111,7 +112,7 @@ export const updateDetailGallery = async (req, res) => {
                if (err) return res.status(500).json({ msg: err.message });
             });
       
-            url = `${req.protocol}://${req.get("host")}/images/gallery/atraction/${fileName}`;
+            url = `${API_URL}images/gallery/atraction/${fileName}`;
          } else {
             const filepath = `./public/images/gallery/${detail.filePict}`;
             fs.unlinkSync(filepath);
@@ -120,7 +121,7 @@ export const updateDetailGallery = async (req, res) => {
                if (err) return res.status(500).json({ msg: err.message });
             });
       
-            url = `${req.protocol}://${req.get("host")}/images/gallery/${fileName}`;
+            url = `${API_URL}images/gallery/${fileName}`;
          }
       }
 
