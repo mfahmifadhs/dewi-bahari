@@ -159,7 +159,7 @@ export const createDestination = async (req, res) => {
     const fileSize = file.data.length;
     const ext = path.extname(file.name);
     const fileName = file.md5 + ext;
-    const url = `${API_URL}}images/destination/${fileName}`;
+    const url = `${API_URL}images/destination/${fileName}`;
     const allowedType = ['.png', '.jpg', '.jpeg'];
 
     if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
