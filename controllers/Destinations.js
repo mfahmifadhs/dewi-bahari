@@ -151,6 +151,7 @@ export const getAllArticleByDestination = async (req, res) => {
 //     // console.log(req.body)
 // }
 export const createDestination = async (req, res) => {
+    const API_URL = process.env.REACT_APP_API_URL_LOCAL;
     if (req.files === null) return res.status(400).json({ msg: "Tidak ada file yang di Upload." })
     // Insert Destination
     const { id, kdProv, kdKab, category, destination, address, description, embMap, userId } = req.body;
@@ -158,7 +159,7 @@ export const createDestination = async (req, res) => {
     const fileSize = file.data.length;
     const ext = path.extname(file.name);
     const fileName = file.md5 + ext;
-    const url = `${req.protocol}://${req.get("host")}/images/destination/${fileName}`;
+    const url = `${API_URL}}images/destination/${fileName}`;
     const allowedType = ['.png', '.jpg', '.jpeg'];
 
     if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
@@ -308,6 +309,7 @@ export const createDestination = async (req, res) => {
 
 // Update destination
 export const updateDestination = async (req, res) => {
+    const API_URL = process.env.REACT_APP_API_URL_LOCAL;
     const dest = await Destination.findOne({
         where: {
             id: req.params.id
@@ -336,7 +338,7 @@ export const updateDestination = async (req, res) => {
     }
 
     const { kdProv, kdKab, category, destination, address, description, embMap, userId, isApprove } = req.body;
-    const url = `${req.protocol}://${req.get("host")}/images/destination/${fileName}`;
+    const url = `${API_URL}images/destination/${fileName}`;
     try {
         await Destination.update({
             kdProv,
