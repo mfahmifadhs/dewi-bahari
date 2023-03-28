@@ -36,9 +36,10 @@ export const getUserById = async (req, res) => {
 // Update user
 export const updateUser = async (req, res) => {
     try {
-        const { roleId, email, name, phoneNum, address } = req.body;
+        const { roleId, destinationId, email, name, phoneNum, address } = req.body;
         await Users.update({
             roleId,
+            destinationId,
             email,
             name,
             phoneNum,

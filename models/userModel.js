@@ -22,6 +22,9 @@ const Users = db.define('t_users', {
         },
         field: 'roleId'
     },
+    destinationId: {
+        type: DataTypes.INTEGER
+    },
     email: {
         type: DataTypes.STRING
     },
