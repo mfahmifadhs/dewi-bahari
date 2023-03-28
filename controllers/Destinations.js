@@ -17,9 +17,6 @@ export const getAllDestination = async (req, res) => {
     try {
         const dest = await Destination.findAll({
             include: [{
-                model: Users,
-                attributes: []
-            }, {
                 model: Province,
                 attributes: []
             }, {
@@ -35,7 +32,6 @@ export const getAllDestination = async (req, res) => {
                 'isApprove',
                 [Sequelize.literal('`t_province`.`province`'), 'province_name'],
                 [Sequelize.literal('`t_city`.`city`'), 'city_name'],
-                [Sequelize.literal('`t_user`.`name`'), 'user_name']
             ],
             order: [
                 ['createdAt', 'DESC']
@@ -51,13 +47,8 @@ export const getAllDestination = async (req, res) => {
 export const getAllDestinationByUser = async (req, res) => {
     try {
         const dest = await Destination.findAll({
-            where: {
-                userId: req.params.id
-            },
             include: [
                 {
-                    model: Users
-                }, {
                     model: Province,
                 }, {
                     model: Cities,
@@ -77,13 +68,8 @@ export const getAllDestinationByUser = async (req, res) => {
 export const getAllDestinationUserById = async (req, res) => {
     try {
         const dest = await Destination.findOne({
-            where: {
-                userId: req.params.id
-            },
             include: [
                 {
-                    model: Users
-                }, {
                     model: Province,
                 }, {
                     model: Cities,
@@ -108,8 +94,6 @@ export const getDestinationById = async (req, res) => {
                 id: req.params.id
             },
             include: [{
-                model: Users
-            }, {
                 model: Province,
             }, {
                 model: Cities,
@@ -154,7 +138,7 @@ export const createDestination = async (req, res) => {
     const API_URL = process.env.REACT_APP_API_URL_LOCAL;
     if (req.files === null) return res.status(400).json({ msg: "Tidak ada file yang di Upload." })
     // Insert Destination
-    const { id, kdProv, kdKab, category, destination, address, description, embMap, userId } = req.body;
+    const { id, kdProv, kdKab, category, destination, address, description, embMap } = req.body;
     const file = req.files.filePict;
     const fileSize = file.data.length;
     const ext = path.extname(file.name);
@@ -177,7 +161,6 @@ export const createDestination = async (req, res) => {
                 address,
                 description,
                 embMap,
-                userId,
                 filePict: fileName,
                 url
             });
@@ -337,7 +320,7 @@ export const updateDestination = async (req, res) => {
         });
     }
 
-    const { kdProv, kdKab, category, destination, address, description, embMap, userId, isApprove } = req.body;
+    const { kdProv, kdKab, category, destination, address, description, embMap, isApprove } = req.body;
     const url = `${API_URL}images/destination/${fileName}`;
     try {
         await Destination.update({
@@ -348,7 +331,6 @@ export const updateDestination = async (req, res) => {
             address,
             description,
             embMap,
-            userId,
             filePict: fileName,
             url: url,
             isApprove
