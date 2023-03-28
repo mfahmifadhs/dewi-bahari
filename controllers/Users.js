@@ -1,5 +1,6 @@
 import Users from '../models/userModel.js';
 import Roles from '../models/roleModel.js';
+import Destination from '../models/destinationModel.js';
 
 // Get all user
 export const getAllUser = async (req, res) => {
@@ -8,6 +9,8 @@ export const getAllUser = async (req, res) => {
             attributes: ['id', 'name', 'email', 'phoneNum', 'address'],
             include: [{
                 model: Roles
+            },{
+                model: Destination
             }]
         });
         res.json(users);

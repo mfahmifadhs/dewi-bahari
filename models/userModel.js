@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import db from "../config/database.js";
 import Roles from "../models/roleModel.js";
+import Destination from "./destinationModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -67,5 +68,6 @@ Users.findAllDeleted = function () {
 };
 
 Users.belongsTo(Roles, { foreignKey: 'roleId', targetKey: 'id' })
+Users.belongsTo(Destination, { foreignKey: 'destinationId', targetKey: 'id' })
 
 export default Users;
