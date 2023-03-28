@@ -57,8 +57,6 @@ export const getAllDestByRc = async (req, res) => {
             isApprove: true
          },
          include: [{
-            model: Users
-         }, {
             model: Province,
          }, {
             model: City,
