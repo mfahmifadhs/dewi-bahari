@@ -28,9 +28,6 @@ const Destination = db.define('t_destinations', {
    embMap: {
       type: DataTypes.TEXT
    },
-   userId: {
-      type: DataTypes.INTEGER
-   },
    filePict: {
       type: DataTypes.TEXT
    },
@@ -63,7 +60,7 @@ Destination.findAllDeleted = function () {
    return this.unscoped().findAll({ where: { deletedAt: { [Sequelize.Op.ne]: null } } });
 };
 
-Destination.belongsTo(Users, {foreignKey: 'userId', targetKey: 'id'})
+// Destination.belongsTo(Users, {foreignKey: 'userId', targetKey: 'id'})
 Destination.belongsTo(Province, {foreignKey: 'kdProv', targetKey: 'id'})
 Destination.belongsTo(Cities, {foreignKey: 'kdKab', targetKey: 'id'})
 

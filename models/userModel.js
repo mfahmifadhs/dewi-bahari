@@ -68,6 +68,6 @@ Users.findAllDeleted = function () {
 };
 
 Users.belongsTo(Roles, { foreignKey: 'roleId', targetKey: 'id' })
-Users.belongsTo(Destination, { foreignKey: 'destinationId', targetKey: 'id' })
+Users.belongsTo(Destination, {foreignKey: 'destinationId', targetKey: 'id'})
 
 export default Users;

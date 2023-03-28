@@ -10,7 +10,8 @@ export const getAllUser = async (req, res) => {
             include: [{
                 model: Roles
             },{
-                model: Destination
+                model: Destination,
+                required: false,
             }]
         });
         res.json(users);
