@@ -1,6 +1,7 @@
 import Users from '../models/userModel.js';
 import Roles from '../models/roleModel.js';
 import Destination from '../models/destinationModel.js';
+import bcrypt from 'bcrypt';
 
 // Get all user
 export const getAllUser = async (req, res) => {
@@ -9,7 +10,7 @@ export const getAllUser = async (req, res) => {
             attributes: ['id', 'name', 'email', 'phoneNum', 'address'],
             include: [{
                 model: Roles
-            },{
+            }, {
                 model: Destination,
                 required: false,
             }]
@@ -40,22 +41,33 @@ export const getUserById = async (req, res) => {
 // Update user
 export const updateUser = async (req, res) => {
     try {
-        const { roleId, destinationId, email, name, phoneNum, address } = req.body;
-        await Users.update({
-            roleId,
-            destinationId,
-            email,
-            name,
-            phoneNum,
-            address,
-        }, {
-            where: {
-                id: req.params.id
-            }
-        });
-        res.json({
-            "message": "User Updated"
-        });
+        const { roleId, destinationId, email, name, phoneNum, address, password, newPassword } = req.body;
+        if (password) {
+            const salt = await bcrypt.genSalt();
+            const hashPassword = await bcrypt.hash(newPassword, salt);
+            await Users.update({
+                password: hashPassword,
+                passwordText: newPassword
+            }, {
+                where: {
+                    id: req.params.id
+                }
+            });
+        } else {
+            await Users.update({
+                roleId,
+                destinationId,
+                email,
+                name,
+                phoneNum,
+                address,
+            }, {
+                where: {
+                    id: req.params.id
+                }
+            });
+        }
+        res.status(201).json({ msg: "Informasi User Berhasil Diperbarui" });
     } catch (error) {
         res.json({ message: error.message });
     }
@@ -64,16 +76,14 @@ export const updateUser = async (req, res) => {
 // Delete user
 export const deleteUser = async (req, res) => {
     try {
-       const data = await Users.findOne({
-          where: {
-             id: req.params.id
-          }
-       });
-       await data.softDelete();
-       res.json({
-          "message": "Data User Berhasil Dihapus"
-       });
+        const data = await Users.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        await data.softDelete();
+        res.status(201).json({ msg: "Berhasil Menghapus Data User" });
     } catch (error) {
-       res.json({ message: error.message });
+        res.json({ message: error.message });
     }
- }
+}
