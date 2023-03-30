@@ -44,9 +44,12 @@ export const Login = async (req, res) => {
          email: req.body.email
       }
    });
-   if (!user) return res.status(404).json({ msg: "User tidak ditemukan" });
+   if (!user.destinationId) {
+      return res.status(404).json({ msg: "Akun tidak aktif" });
+   }
+   if (!user) return res.status(404).json({ msg: "User atau Password tidak ditemukan" });
    const match = await bcrypt.compare(req.body.password, user.password);
-   if (!match) return res.status(400).json({ msg: "Wrong Password" });
+   if (!match) return res.status(400).json({ msg: "Username atau Password salah" });
    // req.session.userId = user.uuid;
    const id = user.id;
    const uuid = user.uuid;

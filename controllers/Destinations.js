@@ -7,6 +7,7 @@ import Article from '../models/articleModel.js';
 import SocialMedia from '../models/socialMedia.js';
 import Officer from '../models/officerModel.js';
 import Facility from '../models/facilityModel.js';
+import Recomendation from '../models/recomendationModel.js';
 import path from 'path';
 import fs from 'fs';
 import { Sequelize } from "sequelize";
@@ -196,7 +197,7 @@ export const createDestination = async (req, res) => {
             });
         } catch (error) {
             res.json({ message: error.message });
-        }   
+        }
     }
     console.log('data', req.body)
     // Insert Contact
@@ -506,6 +507,22 @@ export const updateDestination = async (req, res) => {
 // Delete destination
 export const deleteDestination = async (req, res) => {
     try {
+        await Recomendation.update({
+            destinationId: null
+        }, {
+            where: {
+                destinationId: req.params.id
+            }
+        });
+
+        await Users.update({
+            destinationId: null
+        }, {
+            where: {
+                destinationId: req.params.id
+            }
+        });
+
         const data = await Destination.findOne({
             where: {
                 id: req.params.id
