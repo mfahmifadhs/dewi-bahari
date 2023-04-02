@@ -12,7 +12,8 @@ export const getGallery = async (req, res) => {
    try {
       const data = await Gallery.findAll({
          include: [{
-            model: Destinations
+            model: Destinations,
+            required: false
          }],
          order: [
             ['createdAt', 'DESC']
