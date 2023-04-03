@@ -137,39 +137,46 @@ export const getAllArticleByDestination = async (req, res) => {
 // }
 export const createDestination = async (req, res) => {
     const API_URL = process.env.REACT_APP_API_URL_LOCAL;
-    if (req.files === null) return res.status(400).json({ msg: "Tidak ada file yang di Upload." })
     // Insert Destination
     const { id, kdProv, kdKab, category, destination, address, description, embMap } = req.body;
-    const file = req.files.filePict;
-    const fileSize = file.data.length;
-    const ext = path.extname(file.name);
-    const fileName = file.md5 + ext;
-    const url = `${API_URL}images/destination/${fileName}`;
-    const allowedType = ['.png', '.jpg', '.jpeg'];
+    let fileName = ''
+    let url = ''
+    if (req.files !== null) {
+        const file = req.files.filePict;
+        const fileSize = file.data.length;
+        const ext = path.extname(file.name);
+        fileName = file.md5 + ext;
+        frl = `${API_URL}images/destination/${fileName}`;
+        const allowedType = ['.png', '.jpg', '.jpeg'];
 
-    if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
-    if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran gambar harus kurang dari 5 MB" });
+        if (!allowedType.includes(ext.toLowerCase())) return res.status(422).json({ msg: "Invalid Images" });
+        if (fileSize > 5000000) return res.status(422).json({ msg: "Ukuran gambar harus kurang dari 5 MB" });
 
-    file.mv(`./public/images/destination/${fileName}`, async (err) => {
-        if (err) return res.status(500).json({ msg: err.message });
-        try {
-            await Destination.create({
-                id: id,
-                kdProv,
-                kdKab,
-                category,
-                destination,
-                address,
-                description,
-                embMap,
-                filePict: fileName,
-                url
-            });
-            res.status(201).json({ msg: "Berhasil Menambah Destinasi Wisata" });
-        } catch (error) {
-            res.json({ message: error.message });
-        }
-    })
+        file.mv(`./public/images/destination/${fileName}`, async (err) => {
+            if (err) return res.status(500).json({ msg: err.message });
+        })
+    } else {
+        fileName = null
+        url = null
+    }
+
+    try {
+        await Destination.create({
+            id: id,
+            kdProv,
+            kdKab,
+            category,
+            destination,
+            address,
+            description,
+            embMap,
+            filePict: fileName,
+            url
+        });
+        res.status(201).json({ msg: "Berhasil Menambah Destinasi Wisata" });
+    } catch (error) {
+        res.json({ message: error.message });
+    }
 
     // Insert Facility
     const facilityArr = [];

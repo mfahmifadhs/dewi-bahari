@@ -44,7 +44,7 @@ export const Login = async (req, res) => {
          email: req.body.email
       }
    });
-   if (!user.destinationId) {
+   if (!user.destinationId && user.roleId === 3) {
       return res.status(404).json({ msg: "Akun tidak aktif" });
    }
    if (!user) return res.status(404).json({ msg: "User atau Password tidak ditemukan" });
