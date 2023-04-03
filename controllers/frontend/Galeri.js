@@ -41,6 +41,16 @@ export const getPhoto = async (req, res) => {
                     }
                 })
                 return result
+            } else {
+                const result = image.map((item) => {
+                    return {
+                        ...item.toJSON(),
+                        destination: '',
+                        province: '',
+                        city: '',
+                    }
+                })
+                return result
             }
         }
         const getDestinationInfo = async (id) => {
@@ -106,6 +116,16 @@ export const getVideo = async (req, res) => {
                         destination: dataDestinasi.toJSON().destination,
                         province: province.toJSON().province,
                         city: city.toJSON().city,
+                    }
+                })
+                return result
+            }else {
+                const result = image.map((item) => {
+                    return {
+                        ...item.toJSON(),
+                        destination: '',
+                        province: '',
+                        city: '',
                     }
                 })
                 return result
