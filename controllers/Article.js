@@ -20,6 +20,15 @@ export const getAllArticle = async (req, res) => {
                model: Destinations,
             }
          ],
+         attributes: [
+             // select column yang ingin diambil
+             'id',
+             'title',
+             'content',
+             'isApprove',
+             [Sequelize.literal('`t_destination`.`destination`'), 'destination'],
+             [Sequelize.literal('`t_user`.`name`'), 'user_name']
+         ],
          order: [
             ['createdAt', 'DESC']
          ],
