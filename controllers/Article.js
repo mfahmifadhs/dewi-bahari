@@ -18,6 +18,7 @@ export const getAllArticle = async (req, res) => {
             },
             {
                model: Destinations,
+               required: false
             }
          ],
          attributes: [
