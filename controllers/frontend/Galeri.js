@@ -10,7 +10,8 @@ export const getPhoto = async (req, res) => {
         const galleryName = await Gallery.findAll({
             attributes: ['id', 'destinationId', 'nameGallery'],
             where: {
-                nameGallery: "gallery"
+                nameGallery: "gallery",
+                isApprove: true
             }
         })
         const getGalleryImage = async (id, destinationId) => {
@@ -88,7 +89,8 @@ export const getVideo = async (req, res) => {
         const galleryName = await Gallery.findAll({
             attributes: ['id', 'destinationId', 'nameGallery'],
             where: {
-                nameGallery: "gallery"
+                nameGallery: "gallery",
+                isApprove: true
             }
         })
         const getGalleryImage = async (id, destinationId) => {
