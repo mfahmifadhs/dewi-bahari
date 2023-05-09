@@ -231,7 +231,9 @@ export const createGallery = async (req, res) => {
          id,
          destinationId,
          nameGallery,
-         userId
+         userId,
+         isApprove: null,
+         note: null
       });
       res.status(201).json({ msg: "Berhasil Menambah Galeri" });
    } catch (error) {
@@ -284,5 +286,33 @@ export const deleteGallery = async (req, res) => {
       });
    } catch (error) {
       res.json({ message: error.message });
+   }
+}
+
+// Approve Destination
+export const approveGallery = async (req, res) => {
+   const gallery = await Gallery.findOne({
+       where: {
+           id: req.params.id
+       }
+   });
+   // console.log(destination)
+   if (!gallery) return res.status(404).json({ msg: "No Data Found" });
+
+   const { isApprove, note } = req.body;
+   try {
+       await Gallery.update({
+           isApprove,
+           note
+       }, {
+           where: {
+               id: req.params.id
+           }
+       });
+       res.json({
+           "message": "Galeri Berhasil Disetujui"
+       });
+   } catch (error) {
+       res.json({ message: error.message });
    }
 }

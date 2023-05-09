@@ -15,6 +15,12 @@ const Gallery = db.define('t_galleries', {
    nameGallery: {
       type: DataTypes.TEXT
    },
+   isApprove: {
+      type: DataTypes.STRING
+   },
+   note: {
+      type: DataTypes.TEXT
+   },
    deletedAt: {
       type: DataTypes.DATE,
       defaultValue: null

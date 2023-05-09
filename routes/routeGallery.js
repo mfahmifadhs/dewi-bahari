@@ -1,5 +1,5 @@
 import express from "express";
-import { createGallery, deleteGallery, getAllGalleryByUser, getGallery, getGalleryById, updateGallery } from "../controllers/Gallery.js";
+import { approveGallery, createGallery, deleteGallery, getAllGalleryByUser, getGallery, getGalleryById, updateGallery } from "../controllers/Gallery.js";
 import { deleteDetailGallery, getDetailGallery, getDetailGalleryById, updateDetailGallery } from "../controllers/GalleryDetail.js";
 
 const routeGallery = express.Router();
@@ -10,6 +10,7 @@ routeGallery.get('/gl/us/:id', getAllGalleryByUser);
 routeGallery.get('/gl/detail/:id', getGalleryById);
 routeGallery.patch('/gl/:id', updateGallery);
 routeGallery.delete('/gl/:id', deleteGallery);
+routeGallery.patch('/gl/v/:id', approveGallery);
 
 routeGallery.get('/gd/:id', getDetailGallery);
 routeGallery.get('/gd/detail/:id', getDetailGalleryById);
