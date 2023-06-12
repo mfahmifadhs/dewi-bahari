@@ -10,7 +10,7 @@ export const getDescription = async (req, res) => {
                 menu: 'Mitra'
             }
         })
-        result.push({ title: "Kementrian / Lembaga", desc: description.toJSON().description })
+        result.push({ title: "Kementerian / Lembaga", desc: description.toJSON().description })
 
         const pemda = await Partner.findAll({
             attributes: ['id', 'partner', 'url', 'hyperlink'],
