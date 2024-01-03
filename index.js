@@ -47,7 +47,10 @@ const store = new sessionStore({
 // }));
 
 // app.use(cors({ credentials:true, origin:'http://localhost:3000' }));
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+   origin: 'https://dewi-bahari-front.vercel.app',
+ }));
 // app.use(cookieParser());
 app.use(express.json());
 app.use(FileUpload());
